@@ -1,6 +1,6 @@
 ---
 name: voa
-description: 进行形顶点算符代数 (vertex operator algebra) 的解析、符号化的计算。当需要计算顶点算符代数的 OPE、normal ordered product, Zhu's C2 代数，Zhu's 代数，associate variety 等对象时使用，当需要为其它顶点算符代数程序包书写测试 (test) 时使用，辅助计算程序为 `pyope-voa` 和 `OPEdefs.wls`
+description: 进行顶点算符代数 (vertex operator algebra) 的解析、符号化的计算。当需要计算顶点算符代数的 OPE、normal ordered product, Zhu's C2 代数，Zhu's 代数，associate variety 等对象时使用，当需要为其它顶点算符代数程序包书写测试 (test) 时使用，辅助计算程序为 `pyope-voa` 和 `OPEdefs.wls`
 ---
 
 
