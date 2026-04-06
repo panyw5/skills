@@ -115,39 +115,10 @@ $$
 
 其中 $(\cdot)_{\mathrm{red}}$ 表示取约化（模去幂零根 nilradical）。
 
-### 3.2 与 4d $\mathcal{N}=2$ Higgs branch 的关系
 
-对于 4d $\mathcal{N}=2$ SCFT 的伴随 VOA $\mathcal{V}$，存在两个商代数：
-
-- **Higgs 手征环** $\mathcal{R}_H = \mathcal{V}/\mathcal{V}_+$：交换、结合的 Poisson 代数
-- **$C_2$ 代数** $\mathcal{R}_{\mathcal{V}} = \mathcal{V}/C_2(\mathcal{V})$：交换、结合的 Poisson 代数
-
-它们的关系：$C_2(\mathcal{V}) \subseteq \mathcal{V}_+$，因此有嵌入 $\mathcal{R}_H \subseteq \mathcal{R}_{\mathcal{V}}$。
-
-**猜想 2（Higgs branch reconstruction）**: (eq. 2.37)
-
-$$
-\mathcal{R}_H = (\mathcal{R}_{\mathcal{V}})_{\mathrm{red}}
-$$
-
-等价地，Higgs branch 等于 associated variety：
-
-$$
-\mathcal{M}_H = X_{\mathcal{V}}
-$$
-
-### 3.3 Quasi-lisse VOA
+### 3.2 Quasi-lisse VOA
 
 若强有限生成的 VOA 的 associated variety（视为 Poisson 簇）只有有限多个辛叶 (symplectic leaves)，则称该 VOA 为 **quasi-lisse**。
 
----
 
-## 4. Null vector 与 $C_2$ 余有限性
 
-若 VOA 的强生成元 $G$ 不是 Higgs 手征环生成元，则 $G$ 在 $C_2$ 代数中必须是**幂零**的。这要求真空 Verma 模中存在 null vector 形如 (eq. 3.1)：
-
-$$
-\mathcal{N}_G = (G_{-h_G})^k\,\Omega + \sum_i a^i_{(-h_i - 1)}\,\varphi_i, \quad \varphi_i \in \mathcal{V}, \quad k \in \mathbb{Z}_+
-$$
-
-null vector 的存在精细地依赖于 VOA 的结构常数，因此 Higgs branch reconstruction 猜想对 VOA 施加了**强约束**。
