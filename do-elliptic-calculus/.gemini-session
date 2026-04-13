@@ -1,0 +1,16 @@
+{
+  "session_id": "ai-1768328794-30895",
+  "runtime_dir": "/var/folders/65/5rshty290gzg25m1qkfyvrqh0000gn/T/claude-ai-lelouch/ai-1768328794-30895/gemini",
+  "terminal": "wezterm",
+  "tmux_session": null,
+  "pane_id": "2",
+  "pane_title_marker": "CCB-Gemini",
+  "work_dir": "/Users/lelouch/.claude/skills/analytical-computation",
+  "active": false,
+  "started_at": "2026-01-14 02:26:34",
+  "start_cmd": "gemini; code=$?; echo; echo \"[gemini] exited with code $code. Press Enter to close...\"; read -r _; exit $code",
+  "gemini_session_path": "/Users/lelouch/.gemini/tmp/fe1097ef7b25d8b2658893f9ea779a02c3e0e329103610643dde437a82d725bc/chats/session-2026-01-13T18-22-ee087062.json",
+  "gemini_project_hash": "fe1097ef7b25d8b2658893f9ea779a02c3e0e329103610643dde437a82d725bc",
+  "gemini_session_id": "ee087062-e562-4dd7-8fd8-0203b543fab9",
+  "ended_at": "2026-01-14 10:08:04"
+}

@@ -1,0 +1,17 @@
+{
+  "session_id": "ai-1768330121-50445",
+  "ccb_session_id": "ai-1768330121-50445",
+  "runtime_dir": "/var/folders/65/5rshty290gzg25m1qkfyvrqh0000gn/T/claude-ai-lelouch/ai-1768330121-50445/opencode",
+  "terminal": "wezterm",
+  "tmux_session": null,
+  "pane_id": "3",
+  "pane_title_marker": "CCB-Opencode",
+  "work_dir": "/Users/lelouch/.claude/skills/analytical-computation",
+  "active": false,
+  "started_at": "2026-01-14 02:48:41",
+  "start_cmd": "opencode; code=$?; echo; echo \"[opencode] exited with code $code. Press Enter to close...\"; read -r _; exit $code",
+  "opencode_session_id": "ses_44770afedffefmrPnVCX65dOuQ",
+  "opencode_project_id": "global",
+  "updated_at": "2026-01-14 02:49:11",
+  "ended_at": "2026-01-14 10:08:04"
+}
