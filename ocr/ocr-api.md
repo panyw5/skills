@@ -1,6 +1,8 @@
 # Goal
 这是用于 skill `ocr` 的 API 调用说明文档。参考完整文档 [doc](https://mineru.net/apiManage/docs)
 
+关键输出是 `{{文件夹}}/MinerU-output/{{文件名}}/` 文件夹中的 `{{文件名}}.md` 文件
+
 # 本地 pdf 文件 ocr
 
 参考如下示例代码，通过将文件上传到 MinerU 服务器完成 ocr
@@ -79,3 +81,10 @@ print(res.status_code)
 print(res.json())
 print(res.json()["data"])
 ```
+
+
+# API 调用结果处理
+
+- 将 ocr 结果 (解压后) 放入 `{{文件夹}}/MinerU-output/{{文件名}}/` 文件夹
+- 将其中的 `full.md` 重命名为 `{{文件名}}.md`
+- 移除结果中的 `.json` 文件

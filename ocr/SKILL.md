@@ -7,7 +7,7 @@ description: "perform ocr (optical character recognition) on pdf files in the sp
 
 1. 处理用户输入，确定需要 ocr 的文件和文件夹、ocr 结果存放地点
 2. 准备工作: [prepare](prepare.md)
-3. 调用 api 进行 ocr: [api](api.md)
+3. 调用 api 进行 ocr: [ocr-api](ocr-api.md)
 4. 检查 ocr 结果: [check](check.md)
 5. 修正错误或者反馈
 
@@ -32,7 +32,7 @@ description: "perform ocr (optical character recognition) on pdf files in the sp
 
 # 调用 API 进行 ocr
 
-参考 [api](api.md) 文档，完成调用 API 进行 ocr 的工作
+参考 [ocr-api](ocr-api.md) 文档，完成调用 API 进行 ocr 的工作
 
 # 检查 ocr 结果
 
@@ -40,6 +40,4 @@ description: "perform ocr (optical character recognition) on pdf files in the sp
 
 # 修正错误或者反馈
 
-**必须行为**: 完成上述任务后，请在主对话窗口中输出完成情况 (便于日后检查复盘)，并 **调用 `cunzhi`** MCP 服务器，向用户总结你的回答，并询问是否需要进一步解释。
-
-**禁止行为**: 直接结束对话，不通过 `cunzhi` MCP 服务器反馈结果
+**必须行为**: 完成上述任务后，请在主对话窗口中输出完成情况 (便于日后检查复盘)，调用询问工具 (`question` 或者 `AskUserQuestion`)，向用户总结你的工作，并询问是否需要进一步处理。
