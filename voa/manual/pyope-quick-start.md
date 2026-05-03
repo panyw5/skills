@@ -14,8 +14,9 @@
 
 # 性能要点
 
-- 显式调用 `simplify_with_wolfram(op_expr)`, `simplify_with_wolfram([...])` 可以调用 `wolfram` 批量化简表达式
-- 使用 `set_compute_backend("wolfram", max_workder_number=X)` 让以下函数自动调用 `X` 个 `wolfram` 后端进行并行计算
+- 较小规模的算符化简直接用 `simplify(op_expr)`，更快
+- 对于较大较复杂的表达式，或者大量表达式，显式调用 `simplify_with_wolfram(op_expr)`, `simplify_with_wolfram([...])` 可以调用 `wolfram` 批量化简表达式
+- 使用 `set_compute_backend("wolfram", max_worker_number=X)` 让以下函数自动调用 `X` 个 `wolfram` 后端进行并行计算
 
   ```
   simplify_with_wolfram(op_expr)
@@ -28,6 +29,10 @@
   ├─ list_zero_relations()
 
   ```
+
+  > 根据经验，`max_worker_number` 取 2-4 就可以提升性能
+
+
 
 # 示例
 

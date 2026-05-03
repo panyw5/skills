@@ -38,29 +38,26 @@ Use `MakeOPE([...])` in descending pole order. For example,
 `[pole_4, pole_3, pole_2, pole_1]` means the coefficients of `(z-w)^(-4)` down to `(z-w)^(-1)`.
 
 ## Collect Coefficients of an Expression
-
-`collect_operators_coefficients(...)` is the current helper name.
-
+Extract the coefficients of operator monomials from an expression.
 ```python
 from pyope import NO, collect_operators_coefficients
 
-expr = 3 * NO(T, T) + 2 * d(T) + 5
+expr = 3 * NO(T, T) + 2 * d(T)
 print(collect_operators_coefficients(expr))
 ```
 
-The returned dictionary uses operator monomials as keys. The key `1` means a purely scalar term.
+The returned dictionary uses operator monomials as keys, and coefficients as values.
 
-## Rules To Remember
+## Caution
 
-- `d(T)` and `dn(2, T)` create formal derivatives of operators.
-- Plain `A * B` is not a VOA product. Use `NO(A, B)` instead.
+- Product of operators is **forbidden**
 - The OPE registry is stateful. Clear it before an unrelated computation:
 
-```python
-from pyope import clear_registry
+    ```python
+    from pyope import clear_registry
 
-clear_registry()
-```
+    clear_registry()
+    ```
 
 - `extract_scalar_operator(expr)` splits a scalar coefficient from one operator factor.
 - `is_local_operator(expr)` checks whether an expression is a valid local-operator expression.
