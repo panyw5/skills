@@ -138,6 +138,37 @@ TTransform=TTransForm;
 (* ::Input::Initialization:: *)
 (* Directly transform \[Theta]z\[Tau][i][z,\[Tau]] into its equaling S-dual expression *)
 
+(* ::Input::Initialization:: *)
+
+Clear[Sawtooth,DedekindSum]
+Sawtooth[x_]:=If[IntegerQ[x],0,x-Floor[x]-1/2]
+DedekindSum[h_,k_]:=Sum[Sawtooth[n/k]Sawtooth[(h n)/k],{n,1,k-1}]
+
+
+Clear[\[Eta]ModularDual]
+\[Eta]ModularDual[\[Eta]\[Eta][argTransformed_]]:=Module[{exponent,argTransformedExponentiated,numerator,denominator,p,l,k,m,u,result},
+argTransformedExponentiated=argTransformed/.{\[Lambda]_?NumericQ E^x_:>E^(Log[\[Lambda]]+x)};
+
+exponent=\[Eta]\[Eta][argTransformedExponentiated]/.\[Eta]\[Eta][E^x_]:>(x/(2\[Pi] I)//Together);
+numerator=Numerator[exponent];
+denominator=Denominator[exponent];
+
+p=denominator/\[Tau];
+l=(numerator-(numerator/.\[Tau]->0))/\[Tau];
+
+
+If[GCD[l,p]==1,
+k=(l m+1)/p;
+m=Mod[-PowerMod[l,-1,p],p];
+result=Exp[\[Pi] I((l+(-m))/(12p)-DedekindSum[-m,p])]Sqrt[-I(p u+(-m))]\[Eta]\[Eta][E^(2\[Pi] I u)]/.u->(m+\[Tau])/p,
+None
+];
+If[l==0&&p>1,result=Sqrt[-I p \[Tau]]\[Eta]\[Eta][E^(2\[Pi] I p \[Tau])]];
+If[l==0&&p==1,result=Sqrt[-I \[Tau]/-numerator]\[Eta]\[Eta][E^(2\[Pi] I  \[Tau]/-numerator)]];
+
+result
+];
+
 Clear[SDualFrame]
 SDualFrame[f_]:=Module[{SruleOnEEE,$\[Tau]t,\[Tau]p,\[Alpha],$result,\[ScriptB]},
 \[Alpha][z_,\[Tau]_]:=Sqrt[-I \[Tau]] E^(\[Pi]/\[Tau] I z^2);

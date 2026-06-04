@@ -139,6 +139,32 @@ EE[k_][{
 
 
 (* ::Input::Initialization:: *)
+Clear[EiTwistedOld];
+
+EiTwistedOld[k_/;k>=1,qq_:q,order_:order][\[Lambda]_,\[Theta]_]:=EiTwistedOld[k,qq,order][\[Lambda],\[Theta]]=Module[{result},
+result=If[(\[Lambda]==0||\[Lambda]==1)&&k==1//TrueQ,
+Sum[(\[Theta]^-1 qq^i)/(1-\[Theta]^-1 qq^i)-(\[Theta] qq^i)/(1-\[Theta] qq^i),{i,1,2order}]+1/(1-\[Theta]^-1)-1/2//Series[#,{q,0,order}]&,
+(-(BernoulliB[k,\[Lambda]]/k!)
++If[\[Theta]==1&&(\[Lambda]==1||\[Lambda]==0)//TrueQ,
+1/(k-1)! Sum[((i+\[Lambda])^(k-1) \[Theta]^-1 qq^(i+\[Lambda]))/(1-\[Theta]^-1 qq^(i+\[Lambda])),{i,1,2order}],
+1/(k-1)! Sum[((i+\[Lambda])^(k-1) \[Theta]^-1 qq^(i+\[Lambda]))/(1-\[Theta]^-1 qq^(i+\[Lambda])),{i,0,2order}]
+]
++(-1)^k/(k-1)! Sum[((i-\[Lambda])^(k-1) \[Theta] qq^(i-\[Lambda]))/(1-\[Theta] qq^(i-\[Lambda])),{i,1,2order}])//PowerExpand//Series[#,{q,0,order}]&//Simplify
+];
+result
+];
+
+
+EiTwistedOld[0,q_:q,order_:order][\[Lambda]_,\[Theta]_]:=-1;
+
+Clear[EEOld]
+EEOld[k_][({
+ {\[Phi]_},
+ {\[Theta]_}
+})][q_]:=EiTwistedOld[k,q,order][1/(2\[Pi] I) Log[\[Phi]],\[Theta]]
+
+
+(* ::Input::Initialization:: *)
 Gi[k_][q_:q]:=2Zeta[k]+(2(2\[Pi] I)^k)/Factorial[k-1] Sum[(n^(k-1) q^n)/(1-q^n),{n,1,order}]//Normal
 Table[Gi[2k][q]-(2\[Pi] I)^(2k) Ei[2k][q],{k,1,4}]//qSeries
 

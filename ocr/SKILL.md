@@ -14,10 +14,15 @@ description: "perform ocr (optical character recognition) on pdf files in the sp
 
 # 处理用户输入，确定需要 ocr 的文件和文件夹、ocr 结果存放地点
 
-根据用户输入，有如下几种常见 ocr 场景
+根据用户输入，有如下几种常见 ocr 场景，请你确定需要 ocr 的文件及路径
 - 用户 (或上级 agent) 指定 `{{文件夹}}` 中 **all pdf** 文件均需 ocr
 - 用户 (或上级 agent) 指定文件夹 `{{文件夹}}` 内**部分 pdf** 文件需 ocr
 - 用户 (或上级 agent) 指定 **单独的** 或者若干个文件 `{{文件名}}.pdf`
+  搜索目标文件必须使用 `fd -a --hidden --no-ignore`。例如
+  ```bash
+  fd -a --hidden --no-ignore "Macdonald Index and Chiral Algebra" "/Users/lelouch/Nutstore Files/Math and Physics/Papers"
+  ```
+  `--no-ignore` 选项绕开 `.gitignore` 等忽略规则，避免遗漏
 - 用户 (或上级 agent) 指定单个或多个 `{{url}}` 需 ocr
 
 确定 ocr 结果存放位置

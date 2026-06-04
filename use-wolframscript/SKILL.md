@@ -16,6 +16,11 @@ compatibility: wolframscript
 
 # `wolframscript` basics
 
+程序包调用时，可能需要获取当前 `.wls`、`.m` 文件的路径。用
+```Mathematica
+GetDirectory[NotebookDirectory[]]
+```
+
 
 列表用**花括号**包裹，列表元素用双中括号 ``[[i, j, k, ...]]`` 引用
 ```

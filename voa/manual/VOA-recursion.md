@@ -54,4 +54,3 @@ $$
 E_k\!\left[\begin{matrix} e^{2\pi i h_a} \\ x^{Q} \end{matrix}\right]
 \operatorname{str}_M\, o(a_{[-h_a-n+k]}|b\rangle)\, q^{L_0 - c/24} x^{J_0} \ ,
 $$
-

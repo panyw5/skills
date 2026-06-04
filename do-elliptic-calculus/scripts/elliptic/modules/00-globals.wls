@@ -40,7 +40,7 @@ PrintDebug[f___]:=If[$debug$,Print[f]]
 (* Classify poles of elliptic functions *)
 (* a pole \[ScriptZ]\[Element][0,1] is considered real, and if \[ScriptZ]=Re[\[ScriptZ]]+\[Lambda]\[Tau] for \[Lambda]\[Element](0,1), it is considered imaginary *)
 (* real type gives 1, imaginary type gives -1 *)
-TypeOfPole=If[D[z,\[Tau]]>0,-1,1];
+TypeOfPole[$\[ScriptZ]_]:=If[D[$\[ScriptZ],\[Tau]]>0,-1,1];
 (* plus of minus depending on the type of poles *)
 PM=TypeOfPole;
 

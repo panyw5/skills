@@ -1,7 +1,7 @@
 ---
 name: voa
 description: 进行顶点算符代数 (vertex operator algebra) 的解析、符号化的计算。当需要计算顶点算符代数的 OPE、normal ordered product, Zhu's C2 代数，Zhu's 代数，associate variety 等对象时使用，辅助计算程序为 `pyope-voa` 和 `OPEdefs.wls`
-
+compatibility: wolframscript, OPEdefs.m, OPEdefs.wls, pyope-voa
 ---
 
 
@@ -78,6 +78,11 @@ OPE[B, B] = MakeOPE[{-One, 0}];
 ```
 
 
+## Useful routines
+
+
+
+
 # `pyope-voa` 索引文件
 优点: 功能丰富，附带计算后端切换、Wolfram 批量规范化、Zhu's $C_2$ 代数、Zhu's 代数、有限维结合代数、associate variety、descendant 空间、null states 等功能模块
 
@@ -119,3 +124,7 @@ OPE[B, B] = MakeOPE[{-One, 0}];
 2. 函数要用**中括号** `[arg1, arg2, ...]` 包裹 arguments
 3. **注意**: 变量名、argument 名字**不能**加**下划线**，除非是 `pattern`
 4. 下划线代表 `pattern`，小心使用，例如 `var_` 是一个 pattern，可以匹配任何名字的变量，而 `var` 是一个具体的变量名
+
+
+## Useful routines
+find **null states** using **free field realization** with `pyope-voa`: [find-null-states](find-null-states.md)

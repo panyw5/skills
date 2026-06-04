@@ -60,31 +60,31 @@ Mathematica/Wolfram Language library for symbolic computations involving ellipti
 
 | File | Lines | Purpose |
 |------|-------|---------|
-| 00-globals.wls | 48 | Global configuration |
-| 01-series-utils.wls | 75 | Series utilities |
-| 02-series-solvers.wls | 88 | Equation solvers |
-| 03-plethystic.wls | 47 | Plethystic operations |
-| 04-eisenstein.wls | 157 | Eisenstein series |
-| 05-eisenstein-theta.wls | 122 | E→θ conversion |
-| 06-theta-eisenstein-rules.wls | 169 | θ→E conversion |
-| 07-theta-functions.wls | 136 | Theta functions |
-| 08-special-functions.wls | 113 | ℘, η functions |
-| 09-abstract-series.wls | 146 | Symbol→series |
-| 10-modular-operators.wls | 132 | Modular operators |
-| 11-physical-voa.wls | 54 | VOA quantities |
-| 12-fmlde.wls | 94 | FMLDE generation |
-| 13-simplify.wls | 27 | Simplification |
-| 14-qshift.wls | 575 | Shift operations |
-| 15-dtau-to-dz.wls | 39 | Derivative conversion |
-| 16-modular-transforms.wls | 347 | S,T transforms |
-| 17-mde-transforms.wls | 290 | MDE transforms |
-| main.wls | 65 | Module loader |
+| 00-globals.wls | 47 | Global configuration |
+| 01-series-utils.wls | 72 | Series utilities |
+| 02-series-solvers.wls | 99 | Equation solvers |
+| 03-plethystic.wls | 46 | Plethystic operations |
+| 04-eisenstein.wls | 180 | Eisenstein series |
+| 05-eisenstein-theta.wls | 121 | E→θ conversion |
+| 06-theta-eisenstein-rules.wls | 168 | θ→E conversion |
+| 07-theta-functions.wls | 135 | Theta functions |
+| 08-special-functions.wls | 112 | ℘, η functions |
+| 09-abstract-series.wls | 145 | Symbol→series |
+| 10-modular-operators.wls | 131 | Modular operators |
+| 11-physical-voa.wls | 53 | VOA quantities |
+| 12-fmlde.wls | 93 | FMLDE generation |
+| 13-simplify.wls | 26 | Simplification |
+| 14-qshift.wls | 589 | Shift operations |
+| 15-dtau-to-dz.wls | 38 | Derivative conversion |
+| 16-modular-transforms.wls | 377 | S,T transforms |
+| 17-mde-transforms.wls | 289 | MDE transforms |
+| main.wls | 64 | Module loader |
 
 
 ## Module Descriptions
 
 ### 00-globals.wls
-**Purpose**: Global configuration and utility functions
+**Purpose**: Global configuration, utility functions, and pole classification helpers
 
 **Key Variables**:
 - `order` - Truncation order for q-series (default: 0, set dynamically)
@@ -134,6 +134,8 @@ Mathematica/Wolfram Language library for symbolic computations involving ellipti
 | `SolveqbSeries[expr, vars][solOrder]` | Solve with b-flavor fugacity |
 | `SolveqbiSeries[expr, vars][solOrder]` | Solve with multiple flavors b[i] |
 | `SolveqbiSeriesNumerics[expr, vars][solOrder]` | Numerical solution with π→N[π] |
+| `ToStraight[exp]`, `ToScript[exp]` | Convert between script variables and exponential fugacities |
+| `ProductToScriptSum[f]` | Convert product fugacity expressions to script-variable sums |
 
 **Dependencies**: [01-series-utils.wls](modules/01-series-utils.wls) (uses `LaurentCoefficientList`)
 
@@ -165,6 +167,7 @@ Mathematica/Wolfram Language library for symbolic computations involving ellipti
 | `E2[q]`, `E4[q]` | Shorthand for Ei[2], Ei[4] |
 | `EEE[k][{{α}, {β}}][q]`  | symbolic representation of twisted Eisenstein series|
 | `EiTwisted[k][α, Θ][q]` | Twisted Eisenstein series $E_k\left[\begin{smallmatrix}\alpha\\\Theta\end{smallmatrix}\right](\tau)$ |
+| `EiTwistedOld[k][λ, Θ]`, `EEOld[k]` | Legacy twisted Eisenstein implementation retained for compatibility with `EiTwisted[1][0,z]` |
 | `EE[k][{{α},{Θ}}][q]` | alias for  `EiTwisted` |
 | `Gi[k][q]` | Alternative Eisenstein definition |
 | `E2Wolfger[q, Λ]`, `E4Wolfger[q, Λ]` | Truncated Eisenstein series |
@@ -366,8 +369,9 @@ $$
 | `ThetaExpand[f]` | Expand theta arguments |
 | `CurlyThetaExpand[f]` | Alias for ThetaExpand |
 | `CurlyThetaDerivativeToCurlyThetaP[f]` | Convert Derivative to θp notation |
-| `FlipSign[var][f]` | Flip sign for negative arguments |
-| `FlipSignAllB[f]` | Apply FlipSign to all B[i] |
+| `FlipSign[var][f]` / `FlipSign[f, var]` | Flip sign for negative arguments |
+| `FlipSignAll[f, letter]` | Apply `FlipSign` across indexed variables and the bare variable |
+| `FlipSignAll\[ScriptA]`, `FlipSignAll\[ScriptB]`, `FlipSignAlla`, `FlipSignAllb` | Convenience sign-flip variants, including reversed-order variants |
 
 **Shift Formulas**:
 $$
@@ -408,6 +412,7 @@ $$
 | `TTransForm[f]` | T-transformation: $\tau \to \tau+1$ |
 | `SDualFrame[f]` | Direct S-dual frame conversion |
 | `TDualFrame[f]` | Direct T-dual frame conversion |
+| `Sawtooth[x]`, `DedekindSum[h,k]` | Helpers for Dedekind-sum eta modular dual transformations |
 
 **S-Transformation**:
 $$

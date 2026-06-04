@@ -517,7 +517,9 @@ f//.{Derivative[n_,0][\[CurlyTheta][i_]][z_,q_]:>\[CurlyTheta]ps[n][i][z,q]}]
 
 
 (* ::Input::Initialization:: *)
-Clear[FlipSignAll\[ScriptB],FlipSign]
+Clear[FlipSign,FlipSignAll,
+FlipSignAll\[ScriptA],FlipSignAlla,FlipSignAll\[ScriptA]Reversed,FlipSignAllaReversed,
+FlipSignAllb,FlipSignAllbReversed,FlipSignAll\[ScriptB],FlipSignAll\[ScriptB]Reversed]
 FlipSign[f_][var_]:=Block[{\[CurlyTheta]ps,pnum,signRules,x},
 \[CurlyTheta]ps[pnum_]:=Symbol[StringJoin@@("\[CurlyTheta]"<>ConstantArray["p",pnum])];
 signRules=(Table[\[CurlyTheta]ps[pnum][i][\[Lambda]_ var,q_]/;\[Lambda]<0:>Evaluate[(-1)^pnum \[CurlyTheta]ps[pnum][i][-\[Lambda] var,q]],{pnum,0,maxDerivativeOrder},{i,2,4}]~Join~
@@ -569,6 +571,19 @@ Table[\[CurlyTheta]ps[pnum][i][\[Lambda]_ var+x_,q_]/;\[Lambda]<0:>Evaluate[(-1)
 }][q]/.signRules
 ];
 
-FlipSignAll\[ScriptB][f_]:=f//FlipSign[#][\[ScriptB][1]]&//FlipSign[#][\[ScriptB][2]]&//FlipSign[#][\[ScriptB][3]]&//FlipSign[#][\[ScriptB][4]]&//FlipSign[#][\[ScriptB][5]]&//FlipSign[#][\[ScriptB][6]]&//FlipSign[#][\[ScriptB][7]]&//FlipSign[#][\[ScriptB][8]]&//FlipSign[#][\[ScriptB][1]]&//FlipSign[#][\[ScriptB]]&;
+FlipSign[f_,var_]:=FlipSign[f][var]
 
+FlipSignAll[f_,letter_]:=Fold[#2[#1]&,f,Table[With[{i=i},FlipSign[#,letter[i]]&],{i,10}]//Reverse]//FlipSign[#][letter]&;
+
+FlipSignAll\[ScriptB][f_]:=Fold[#2[#1]&,f,Table[With[{i=i},FlipSign[#,\[ScriptB][i]]&],{i,10}]]//FlipSign[#][\[ScriptB]]&;
+FlipSignAll\[ScriptB]Reversed[f_]:=Fold[#2[#1]&,f,Table[With[{i=i},FlipSign[#,\[ScriptB][i]]&],{i,10}]//Reverse]//FlipSign[#][\[ScriptB]]&;
+
+FlipSignAllb[f_]:=Fold[#2[#1]&,f,Table[With[{i=i},FlipSign[#,b[i]]&],{i,10}]]//FlipSign[#][b]&;
+FlipSignAllbReversed[f_]:=Fold[#2[#1]&,f,Table[With[{i=i},FlipSign[#,b[i]]&],{i,10}]//Reverse]//FlipSign[#][b]&;
+
+FlipSignAll\[ScriptA][f_]:=Fold[#2[#1]&,f,Table[With[{i=i},FlipSign[#,\[ScriptA][i]]&],{i,10}]]//FlipSign[#][\[ScriptB]]&;
+FlipSignAll\[ScriptA]Reversed[f_]:=Fold[#2[#1]&,f,Table[With[{i=i},FlipSign[#,\[ScriptA][i]]&],{i,10}]//Reverse]//FlipSign[#][\[ScriptB]]&;
+
+FlipSignAlla[f_]:=Fold[#2[#1]&,f,Table[With[{i=i},FlipSign[#,a[i]]&],{i,10}]]//FlipSign[#][a]&;
+FlipSignAllaReversed[f_]:=Fold[#2[#1]&,f,Table[With[{i=i},FlipSign[#,a[i]]&],{i,10}]//Reverse]//FlipSign[#][a]&;
 

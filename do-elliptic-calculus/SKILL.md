@@ -16,8 +16,11 @@ meta:
 ## Eisenstein Series, and Jacobi Theta Functions, Weierstrass function series, q-Pochhammer symbols, Plethystic exponential
 
 Useful definitions and scripts are available in folder `./scripts/elliptic/`
-- [README](./scripts/elliptic/README.md): overview of the `modules`
-- [conventions](./scripts/elliptic/conventions.md): formal definitions, conventions, and common identities
+- [README](./scripts/elliptic/README.md): overview of the `modules` in `./scripts/elliptic/`
+- [conventions](./scripts/elliptic/conventions.md): formal definitions, latex conventions, coding conventions, and common identities
+
+
+目录 [identities](./scripts/identities/) 下有大量 Eisenstein 和 Jacobi theta 函数的恒等式
 
 
 # `wls` coding convention
@@ -25,3 +28,23 @@ Useful definitions and scripts are available in folder `./scripts/elliptic/`
    否则 `wolframscript` 可能会误解表达式的结构，将第二行以及之后的行当成新的表达式，导致语法错误或计算错误
 2. 函数要用**中括号** `[arg1, arg2, ...]` 包裹 arguments
 3. **WARNING**: 变量名、argument 名字**不能**加下划线 (下划线代表 `pattern`)
+4. **CRICITAL**: 必须使用如下符号 (详情见 [README.md](./scripts/elliptic/README.md))
+  ```Mathematica
+
+  EEE[k][{{a}, {b}}][q]
+
+  
+  ```
+
+
+# LaTex reply format
+
+输出回答时，必须用如下 `LaTex` 符号标记 Eisenstein 级数以及 Jacobi theta
+- Jacobi theta 函数 $\vartheta_i(\mathfrak{z})$ 或者 $\vartheta_i(\mathfrak{z}|\tau)$
+- 标准 Eisenstein 级数记号 $E_k(\tau)$
+- 行间 twisted Eisenstein 级数记号
+  $$
+  E_k\left[\begin{matrix}\phi \\ \theta\end{matrix}\right](\tau), \qquad
+  E_k\left[\begin{matrix}\phi \\ \theta\end{matrix}\right]
+  $$
+- 行内 twisted Eisenstein 级数记号 $E_k [\substack{\phi \\ \theta}]$

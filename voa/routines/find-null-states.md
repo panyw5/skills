@@ -1,5 +1,6 @@
 ---
 description: 寻找 null states
+compatibility: pyope-voa
 ---
 
 # 用 `pyope` 和 free field realization 寻找 null states

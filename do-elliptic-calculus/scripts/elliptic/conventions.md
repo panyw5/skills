@@ -40,10 +40,12 @@ $$
 $q$-Pochhammer 符号：$(z;q) = \prod_{k=0}^{+\infty}(1 - zq^k)$
 
 $$
-\vartheta_1(\mathfrak{z}|\tau) = & \ i q^{\frac{1}{8}} z^{-\frac{1}{2}}(q;q)(z;q)(z^{-1}q;q) \ , \\
+\begin{align}
+  \vartheta_1(\mathfrak{z}|\tau) = & \ i q^{\frac{1}{8}} z^{-\frac{1}{2}}(q;q)(z;q)(z^{-1}q;q) \ , \\
   \vartheta_2(\mathfrak{z}|\tau) = & \ q^{\frac{1}{8}}z^{-\frac{1}{2}}(q;q)(-z;q)(- z^{-1}q;q) \ , \\
   \vartheta_3(\mathfrak{z}|\tau)= & \ (q;q)(-zq^{1/2};q)(- z^{-1}q^{1/2};q) \ , \\
   \vartheta_4(\mathfrak{z}|\tau)= & \ (q;q)(zq^{1/2};q)(z^{-1}q^{1/2};q) \ .
+\end{align}
 $$
 
 ### 周期性质
@@ -97,51 +99,28 @@ $$
 \mathop{\operatorname{Res}}\limits_{a \to b^{\frac{1}{n}}q^{\frac{k}{n} + \frac{1}{2n}}e^{2\pi i \frac{\ell}{n}}} \frac{1}{a} \frac{1}{\vartheta_4(n\mathfrak{a} - \mathfrak{b})} = \frac{1}{n} \frac{1}{(q;q)^3} (-1)^k q^{\frac{1}{2}k(k+1)}
 $$
 
----
 
-## Weierstrass 函数族
-
-椭圆函数具有双周期性：$f(z) = f(z+\tau) = f(z+1)$
-
-### Weierstrass ζ 函数
-
-$$
-\zeta(z) = \frac{1}{z} + \sum'_{m,n} \left[\frac{1}{z - m - n\tau} + \frac{1}{m + n\tau} + \frac{z}{(m + n\tau)^2}\right]
-$$
-
-**准周期性：**
-- $\zeta(z + 1|\tau) - \zeta(z|\tau) = 2\eta_1(\tau)$
-- $\zeta(z + \tau|\tau) - \zeta(z|\tau) = 2\eta_2(\tau) = 2\tau\eta_1(\tau) - 2\pi i$
-
-其中 $\eta_1(\tau) = -2\pi^2 E_2$，$\eta_2(\tau) = \tau\eta_1(\tau) - \pi i$
-
-**与 theta 函数的关系：**
-
-$$
-\zeta(\mathfrak{z}) = \frac{\vartheta'_1(\mathfrak{z})}{\vartheta_1(\mathfrak{z})} - 4\pi^2 \mathfrak{z} E_2
-$$
-
-### Weierstrass ℘ 函数
-
-$$
-\wp(z) = \frac{1}{z^2} + \sum_{(m,n)\neq(0,0)} \left[\frac{1}{(z - m - n\tau)^2} - \frac{1}{(m + n\tau)^2}\right]
-$$
-
-**周期性：**
-
-$$
-\wp(z) = \wp(z + 1) = \wp(z + \tau)
-$$
-
-**与 ζ 函数的关系：**
-
-$$
-\wp(z) = -\partial_z \zeta(z)
-$$
 
 ---
 
 ## Eisenstein 级数
+
+### LaTex 记号与 wolframscript 记号
+
+**LaTex 记号**
+- 标准 Eisenstein 级数记号 $E_k(\tau)$
+- 行间 twisted Eisenstein 级数记号
+  $$
+  E_k\left[\begin{matrix}\phi \\ \theta\end{matrix}\right](\tau)
+  $$
+- 行内 twisted Eisenstein 级数记号 $E_k [\substack{\phi \\ \theta}]$
+
+**wolframscript 记号**
+
+wolframscript 里面的 Eisenstein 函数分成两类：抽象符号和具体级数展开表达式。抽象符号用于符号运算，具体级数展开表达式用于数值计算。
+
+- 抽象符号 `EEi[k, q]`，级数展开 `Ei[k,q]`
+- 抽象符号 `EEE[k][{{phi}, {theta}}][q]`, 级数展开 `EE[k][{{phi}, {theta}}][q]`
 
 ### 标准 Eisenstein 级数定义
 
@@ -270,6 +249,50 @@ $$
 $$
 \sum_{\pm\pm}E_k\left[\begin{matrix}\pm 1 \\ \pm z\end{matrix}\right](\tau) = \frac{4}{2^k}E_k\left[\begin{matrix}+1 \\ z^2\end{matrix}\right](\tau)
 $$
+
+
+---
+
+## Weierstrass 函数族
+
+椭圆函数具有双周期性：$f(z) = f(z+\tau) = f(z+1)$
+
+### Weierstrass ζ 函数
+
+$$
+\zeta(z) = \frac{1}{z} + \sum'_{m,n} \left[\frac{1}{z - m - n\tau} + \frac{1}{m + n\tau} + \frac{z}{(m + n\tau)^2}\right]
+$$
+
+**准周期性：**
+- $\zeta(z + 1|\tau) - \zeta(z|\tau) = 2\eta_1(\tau)$
+- $\zeta(z + \tau|\tau) - \zeta(z|\tau) = 2\eta_2(\tau) = 2\tau\eta_1(\tau) - 2\pi i$
+
+其中 $\eta_1(\tau) = -2\pi^2 E_2$，$\eta_2(\tau) = \tau\eta_1(\tau) - \pi i$
+
+**与 theta 函数的关系：**
+
+$$
+\zeta(\mathfrak{z}) = \frac{\vartheta'_1(\mathfrak{z})}{\vartheta_1(\mathfrak{z})} - 4\pi^2 \mathfrak{z} E_2
+$$
+
+### Weierstrass ℘ 函数
+
+$$
+\wp(z) = \frac{1}{z^2} + \sum_{(m,n)\neq(0,0)} \left[\frac{1}{(z - m - n\tau)^2} - \frac{1}{(m + n\tau)^2}\right]
+$$
+
+**周期性：**
+
+$$
+\wp(z) = \wp(z + 1) = \wp(z + \tau)
+$$
+
+**与 ζ 函数的关系：**
+
+$$
+\wp(z) = -\partial_z \zeta(z)
+$$
+
 
 ---
 
