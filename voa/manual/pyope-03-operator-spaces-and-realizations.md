@@ -74,12 +74,22 @@ print(realize(NO(W, d(W))))
 
 `make_realized(...)` is the convenient form when the Python variable name should become the generator name.
 
+It **preserves the input order** of the expressions you pass in, and name inference prefers the latest binding name in the caller namespace.
+
 ```python
 from pyope import NO, make_realized
 
 J0 = NO(J, J)
 J0, = make_realized([J0])
 print(J0.name)
+```
+
+For multi-generator promotion, unpack in the same order you passed to `make_realized(...)`.
+
+```python
+Jplus = NO(J, J)
+dJ = d(J)
+Jplus, dJ = make_realized([Jplus, dJ])
 ```
 
 `BasicOperator` and `RealizedGenerator` 支持自定义 LaTeX 显示名。

@@ -26,6 +26,7 @@
 
 - `LocalOperatorBasis`, `LocalOperatorCanonicalizer`, `SparseLinearContext`
 - `RealizedGenerator`, `make_realized`, `realize`, `realized_coordinates`
+- `make_realized(...)` preserves input order and infers names from the latest caller-side binding
 - `list_independent_ops`, `list_independent_op_indices`, `list_zero_relations`
 - `DescendantSpace`
 - `compact_family_poles`, `qp`, `quasiprimary_product`
