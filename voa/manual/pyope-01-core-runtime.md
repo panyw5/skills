@@ -64,4 +64,10 @@ The returned dictionary uses operator monomials as keys, and coefficients as val
 
 ## Backend Reminder
 
-**禁止**使用 `set_compute_backend("wolfram")`，Wolfram 后端仅通过 `simplify_with_wolfram(...)` 显式调用。
+默认后端是 `sympy`。
+
+- 需要进程级切换时，使用 `set_compute_backend("wolfram", max_worker_number=...)`
+- 需要局部切换时，使用 `with compute_backend("wolfram"):`
+- 需要显式单次或批量化简时，使用 `simplify_with_wolfram(...)`
+
+如果环境里没有 `wolframscript`，切换到 `wolfram` 后端会抛出带安装提示的错误。

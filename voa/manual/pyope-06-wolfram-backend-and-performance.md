@@ -11,7 +11,10 @@
 ## Public Positioning
 
 - 默认使用 `sympy` 后端
-- **禁止**使用 `set_compute_backend("wolfram")`，Wolfram 后端仅通过 `simplify_with_wolfram(...)` 显式调用
+- `set_compute_backend("wolfram", max_worker_number=...)` 支持进程级后端切换
+- `compute_backend("wolfram", max_worker_number=...)` 支持局部上下文切换
+- `simplify_with_wolfram(...)` 仍然是显式单次或批量化简的直接入口
+- 如果没有安装 `wolframscript`，切换或显式调用会抛出带安装提示的错误
 
 ## What `simplify_with_wolfram(...)` Accepts
 
