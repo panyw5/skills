@@ -60,6 +60,8 @@ GbarWbar = (Fraction(8, 3) * NO(b, NO(d(d(c)), c))
 
 generators = [T, J, W, Wbar, G, Gbar, GW, GbarWbar]
 
+# make_realized 会按照 argument generators 里面的算符顺序进行算符注册
+# 后续 .list() 方法产生的 NO 乘积也是按照这个顺序进行排列
 (T, J, W, Wbar, G, Gbar, GW, GbarWbar) = make_realized(generators)
 generators = [T, J, W, Wbar, G, Gbar, GW, GbarWbar]
 
@@ -67,7 +69,6 @@ GW.set_latex(r"G_W");
 Gbar.set_latex(r"\bar G");
 Wbar.set_latex(r"\bar W");
 GbarWbar.set_latex(r"{\bar G_{\bar W}}");
-
 ```
 
 计算由 generators 自由生成的 $weight=4$ 算符空间里有哪些线性组合 $= 0$ 的 relations
