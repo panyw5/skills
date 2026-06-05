@@ -45,7 +45,9 @@
 ## Backend and Performance
 
 - Public workflows should stay on `sympy`.
-- **禁止**使用 `set_compute_backend("wolfram")`，Wolfram 后端仅通过 `simplify_with_wolfram()` 显式调用
+- `set_compute_backend("wolfram", max_worker_number=...)` performs a process-wide backend switch
+- `compute_backend("wolfram", max_worker_number=...)` performs a scoped backend switch
+- `simplify_with_wolfram(...)` remains the direct entry point for explicit one-shot or batched Wolfram simplification
 - `simplify_with_wolfram(expr)` 接受单个表达式、列表、元组或字典载荷
 - `LocalOperatorBasis` 无构造器级别 `max_weight`；使用 `basis.list(weight)` 和 `basis.coordinates(expr, weight=...)`
 - 若生成元含有**非正** conformal weight，构造 `LocalOperatorBasis` 时必须提供 `max_occurence`

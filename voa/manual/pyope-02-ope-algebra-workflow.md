@@ -73,4 +73,15 @@ batch = [NO(T, T) + NO(T, T), d(NO(T, T))]
 print(simplify_with_wolfram(batch))
 ```
 
-`simplify_with_wolfram(...)` 接受单个表达式、列表、元组或字典载荷。批量操作优先使用列表输入。**禁止**使用 `set_compute_backend("wolfram")`。
+`simplify_with_wolfram(...)` 接受单个表达式、列表、元组或字典载荷。批量操作优先使用列表输入。
+
+如果你希望 `OPE(...)` 或 `LocalOperatorBasis` 相关规范化流程整体走 Wolfram 路线，可以显式切换后端：
+
+```python
+from pyope import compute_backend, set_compute_backend
+
+set_compute_backend("wolfram", max_worker_number=4)
+
+with compute_backend("wolfram"):
+	print(OPE(T, T))
+```
