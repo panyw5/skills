@@ -64,10 +64,10 @@ ListLettersAtWeight[4, {T}]
 脚本还设置：
 
 ```wolfram
-LettersAtWeight[0] = {};
+ListLettersAtWeight[0] = {One};
 ```
 
-这表示权重 $0$ 不产生普通 letter。
+这表示权重 $0$ 的 letter 贡献为单位算符 `One`（真空算符），而非空列表。这个设定确保在构造复合算符时，权重分拆中可能出现 $0$ 权重片段时仍能正确引入单位算符。
 
 ---
 
@@ -81,23 +81,14 @@ ListOpsAtPartition[partition_List, generators_: generators]
 
 例如 `partition = {1, 2}` 时，函数会：
 
-1. 对每个权重片段调用 `LettersAtWeight[part]`；
+1. 对每个权重片段调用 `ListLettersAtWeight[part]`；
 2. 用 `Outer` 取所有组合；
 3. 把组合包装成 `NO[...]`；
 4. 用 `SortBy[..., OPEPosition]` 按底层 OPE 声明顺序排序；
-5. 删除重复项和 `0`。
+5. 删除重复项和 `0`；
+6. 将 `NO[]` 替换为 `One`（空正规序积对应单位算符）。
 
 这一步保证复合算符有稳定的正规序表示，避免同一组合因顺序不同重复出现。
-
-源码中这一段调用的是 `LettersAtWeight[part]`，而公开枚举函数名是 `ListLettersAtWeight[n, generators]`，并且文件里只显式设置了 `LettersAtWeight[0] = {}`。如果运行时没有在别处给 `LettersAtWeight[n]` 定义规则，需要先确认这里是否应当补一个别名，例如让 `LettersAtWeight[n_]` 转发到 `ListLettersAtWeight[n]`。
-
-一个最小的运行时补法可以写成：
-
-```wolfram
-LettersAtWeight[n_] := ListLettersAtWeight[n]
-```
-
-如果要使用非全局生成元列表，则需要把第二个参数也纳入你的封装。本文按脚本意图说明固定权重枚举流程，但实际计算时应检查这个符号是否已经在加载链中定义。
 
 ---
 
@@ -115,10 +106,10 @@ ListOpsAtWeight[n, generators_: generators]
 Table[
   ListOpsAtPartition[partition],
   {partition, 1/2 IntegerPartitions[2 n]}
-] // Flatten
+] /. NO[] -> One // Flatten
 ```
 
-因为它对 `2 n` 做整数分拆再除以 $2$，所以可以自然处理半整数权重。例如 $n = 5/2$ 时，会枚举由半整数权重 letter 组成的正规序表达式。
+其中 `/. NO[] -> One` 将空正规序积替换为 `One`（单位算符），确保与 `ListLettersAtWeight[0] = {One}` 的行为一致。
 
 ### 使用示例
 
@@ -169,7 +160,7 @@ linearCombination = Array[$a, Length[ops]] . ops;
 linearCombinationRealized = linearCombination //. realization
 ```
 
-接着按 `NO[_, _]`、生成元、自由场及其导数收集系数，并求解所有系数同时为零的线性方程。若有解，返回线性关系表达式列表。
+接着按 `NO[_, _]`、生成元、自由场及其导数收集系数，并求解所有系数同时为零的线性方程。这个版本直接引用 `freefields` 作为列表，预期在调用前 `freefields` 已被正确定义为一个列表（而非未初始化或非列表形式的符号）。若有解，返回线性关系表达式列表。
 
 ### 使用骨架
 
@@ -199,6 +190,8 @@ ops = ListOpsAtWeight[3] // OPESimplify;
 ```
 
 也就是说，它会忽略传入的 `ops`，固定检查权重 $3$ 的空间。使用时要注意这一点；如果要检查指定列表，优先使用带 `realization` 的版本，或者先修改源码中的这行固定赋值。
+
+另外，不带 realization 的版本在收集待收集项的系数时使用了 `freefields` 的头部检查：`If[Head[freefields]==List, freefields, {}]`，因此即使 `freefields` 尚未初始化为列表也不会直接报错，而是回退到空列表。而带 realization 的版本直接引用 `freefields` 作为列表，预期它在调用前已被正确定义为一个列表。
 
 ---
 

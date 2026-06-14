@@ -1,7 +1,7 @@
 ---
 name: voa
-description: 进行顶点算符代数 (vertex operator algebra) 的解析、符号化的计算。当需要计算顶点算符代数的 OPE、normal ordered product, Zhu's C2 代数，Zhu's 代数，associate variety 等对象时使用，辅助计算程序为 `pyope-voa` 和 `OPEdefs.wls`
-compatibility: wolframscript, OPEdefs.m, OPEdefs.wls, pyope-voa
+description: 进行顶点算符代数 (vertex operator algebra) 的解析、符号化的计算。当需要计算顶点算符代数的 OPE、normal ordered product, Zhu's C2 代数，Zhu's 代数，associate variety 等对象时使用，辅助计算程序为 `pyope-voa`、`OPEdefs.wls`、`VOA.wls` 和 `freeFieldVOA.m`
+compatibility: wolframscript, OPEdefs.m, OPEdefs.wls, freeFieldVOA.m, VOA.wls, pyope-voa
 ---
 
 
@@ -20,7 +20,7 @@ Zhu's 递归公式: [Zhu-recursion](manual/VOA-recursion.md)
 
 - 算符极点 $a(z) b(w)$ 可以展开为
   $$
-  a(z) b(w) = \sum_{n} \frac{\{ab\}_n(w)}{(z - w)^n} 
+  a(z) b(w) = \sum_{n} \frac{\{ab\}_n(w)}{(z - w)^n}
   $$
   **WARNING**: 我们用**花括号 $\{...\}_n$**，但 Theilemanns 的符号用**中括号 `[ab]_n`**
 - 正规乘积 (圆括号) $(ab)$ 也记为 $\operatorname{NO}(a,b)$
@@ -61,8 +61,8 @@ Zhu's 递归公式: [Zhu-recursion](manual/VOA-recursion.md)
 ```Mathematica
 Bosonic[A, B] (* A first, B after *)
 OPE[A, A] = MakeOPE[{One, 0}];
-OPE[A, B] = MakeOPE[{2B}]; (* CORRECT order *); 
-(* WRONG order OPE[B, A] = MakeOPE[{2B}]; WRONG order *); 
+OPE[A, B] = MakeOPE[{2B}]; (* CORRECT order *);
+(* WRONG order OPE[B, A] = MakeOPE[{2B}]; WRONG order *);
 OPE[B, B] = MakeOPE[{-One, 0}];
 ```
 
@@ -72,8 +72,8 @@ OPE[B, B] = MakeOPE[{-One, 0}];
 Bosonic[A] (* A first *)
 Fermionic[B] (* B after *)
 OPE[A, A] = MakeOPE[{One, 0}];
-OPE[A, B] = MakeOPE[{2B}]; (* CORRECT order *); 
-(* WRONG order OPE[B, A] = MakeOPE[{2B}]; WRONG order *); 
+OPE[A, B] = MakeOPE[{2B}]; (* CORRECT order *);
+(* WRONG order OPE[B, A] = MakeOPE[{2B}]; WRONG order *);
 OPE[B, B] = MakeOPE[{-One, 0}];
 ```
 
@@ -81,6 +81,23 @@ OPE[B, B] = MakeOPE[{-One, 0}];
 ## Useful routines
 
 
+# `VOA.wls` 索引文件
+优点: 自由场实现、OPE 展开、固定权重算符空间、强闭合检查、null relation 搜索和 Zhu 递推
+
+使用索引与背景: [voa-index](manual/voa-index.md)
+
+源文件: [VOA.wls](manual/scripts/VOA.wls)
+运行时依赖: [freeFieldVOA.m](manual/scripts/freeFieldVOA.m)
+
+**定位**: 面向 Mathematica / Wolfram Language 的 VOA 计算辅助脚本，覆盖自由场实现、完整 OPE 展开、固定权重算符空间枚举、强闭合检查、线性关系搜索和 Zhu 递推。更像一组 notebook 辅助函数，不是独立 package。
+
+**主要功能模块**:
+- 自由场实现与场声明 (`Declare`, field recognition, `MakeVertexField`)
+- 完整 OPE 展开 (`OPEFull`, 自由场 + 顶点算子合并)
+- 固定权重算符空间枚举 (`ListLettersAtWeight`, `ListOpsAtPartition`, `ListOpsAtWeight`)
+- 强闭合检查 (`CheckStrongClosure`)
+- 线性关系搜索 (`ListRelations`)
+- Zhu 递推与环面迹 (`ZhuRecursion`, Eisenstein 化简, `qDq`, `DDbi`)
 
 
 # `pyope-voa` 索引文件
@@ -127,4 +144,4 @@ OPE[B, B] = MakeOPE[{-One, 0}];
 
 
 ## Useful routines
-find **null states** using **free field realization** with `pyope-voa`: [find-null-states](find-null-states.md)
+find **null states** using **free field realization** with `pyope-voa`: [routines/find-null-states](routines/find-null-states.md)

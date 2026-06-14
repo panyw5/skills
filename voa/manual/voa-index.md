@@ -1,7 +1,7 @@
 # VOA.wls 使用索引
 
-**源文件**: [VOA.wls](scripts/VOA.wls)  
-**依赖**: [OPEdefs.wls](scripts/OPEdefs.wls) 与 `VOA.wls` 启动时导入的运行时文件 `freeFieldVOA.m`  
+**源文件**: [VOA.wls](scripts/VOA.wls)
+**依赖**: [OPEdefs.wls](scripts/OPEdefs.wls) 与 `VOA.wls` 启动时导入的运行时文件 [freeFieldVOA.m](scripts/freeFieldVOA.m)
 **定位**: 面向 Mathematica / Wolfram Language 的 VOA 计算辅助脚本，用于自由场实现、OPE 展开、强闭合检查、固定权重算符空间、null relation 搜索和 Zhu 递推。它更像一组 notebook 辅助函数，而不是带有完整 package context 的独立包。
 
 `VOA.wls` 是由 Mathematica notebook 自动生成的 initialization 文件。文件头明确说明不要直接编辑该 `.wls` 文件；如果需要改源码，应改对应 notebook，再由 Mathematica 自动导出。
@@ -10,16 +10,16 @@
 
 ## 文档入口
 
-1. [初始化、场声明与 Lie 代数化简](voa-01-setup-and-fields.md)  
+1. [初始化、场声明与 Lie 代数化简](voa-01-setup-and-fields.md)
    解释如何加载脚本、声明自由场和复合生成元的宇称，并说明 `simplifyLieAlgebra` 中的指标缩并规则。
 
-2. [完整 OPE、极点与强闭合检查](voa-02-ope-and-closure.md)  
+2. [完整 OPE、极点与强闭合检查](voa-02-ope-and-closure.md)
    说明 `OPEFull`、`Bracket`、`Completion` 和 `CheckStrongClosure` 的用途，以及如何用 realization 验证候选强生成元是否闭合。
 
-3. [固定权重算符空间与关系搜索](voa-03-operator-spaces-and-relations.md)  
+3. [固定权重算符空间与关系搜索](voa-03-operator-spaces-and-relations.md)
    说明 `ListLettersAtWeight`、`ListOpsAtPartition`、`ListOpsAtWeight` 与 `ListRelations`，用于构造固定 conformal weight 的正规序算符基底并找线性关系。
 
-4. [Zhu 递推、环面迹与 Eisenstein 化简](voa-04-zhu-recursion.md)  
+4. [Zhu 递推、环面迹与 Eisenstein 化简](voa-04-zhu-recursion.md)
    说明 `ZhuRecursion`、`str`、`o`、`qDq`、`DDbi`、`EEE`、`EEi` 的工作方式，以及递推输出中常见符号的含义。
 
 相关背景文档：
@@ -42,11 +42,11 @@
 | 153-221 | 场声明与顶点场包装 | `Declare`、`IsBosonicField`、`IsFermionicField`、`MakeVertexField`。 |
 | 225-245 | 完整 OPE 展开 | `OPEFull` 结合自由场 OPE 与顶点算子 OPE，输出指定阶数的级数。 |
 | 249-263 | 固定权重算符枚举 | `ListLettersAtWeight`、`ListOpsAtPartition`、`ListOpsAtWeight`。 |
-| 266-281 | 强闭合检查 | `CheckStrongClosure` 逐对检查 realized generators 的 OPE 极点能否由候选算符空间线性表示。 |
-| 286-315 | 关系搜索 | `ListRelations` 在抽象算符或 realization 下寻找线性关系。 |
-| 319-327 | bracket 与 quasiprimary completion | `Bracket` 统一正负极点记号，`Completion` 从极点组合准初级分量。 |
-| 331-363 | trace 表达式包装与非交换乘法 | `str`、`o` 和 `NonCommutativeMultiply` 的线性规则。 |
-| 366-574 | Zhu 递推与 Eisenstein 化简 | `ZhuRecursion` 将正规序单点迹递推为低阶 bracket、$q$ 导数、$b$ 导数和 Eisenstein 系列组合。 |
+| 266-315 | 强闭合检查 | `CheckStrongClosure` 逐对检查 realized generators 的 OPE 极点能否由候选算符空间线性表示。 |
+| 318-348 | 关系搜索 | `ListRelations` 在抽象算符或 realization 下寻找线性关系。 |
+| 352-360 | bracket 与 quasiprimary completion | `Bracket` 统一正负极点记号，`Completion` 从极点组合准初级分量。 |
+| 364-386 | trace 表达式包装与非交换乘法 | `str`、`o` 和 `NonCommutativeMultiply` 的线性规则。 |
+| 399-621 | Zhu 递推与 Eisenstein 化简 | `ZhuRecursion` 将正规序单点迹递推为低阶 bracket、$q$ 导数、$b$ 导数和 Eisenstein 系列组合。 |
 
 ---
 
@@ -125,10 +125,10 @@ ZhuRecursion[str[o[NO[A, B]]]]
 
 ## 使用注意
 
-- `VOA.wls` 不是独立包。它依赖 `freeFieldVOA.m` 和底层 OPE 定义中的 `OPE`、`OPEPole`、`NO`、`Bosonic`、`Fermionic`、`OPEData` 等符号。当前手册目录下能看到 [OPEdefs.wls](scripts/OPEdefs.wls)，但 `freeFieldVOA.m` 需要由运行环境提供。
+- `VOA.wls` 不是独立包。它依赖 `freeFieldVOA.m` 和底层 OPE 定义中的 `OPE`、`OPEPole`、`NO`、`Bosonic`、`Fermionic`、`OPEData` 等符号。运行时文件 `freeFieldVOA.m` 已在 `scripts/` 目录下提供；`VOA.wls` 默认通过 `Import["freeFieldVOA.m"]` 加载它，后者内部导入 `OPEdefs.m` 作为底层 OPE 引擎。当前手册目录下也保留了 [OPEdefs.wls](scripts/OPEdefs.wls) 作为独立的 OPE 符号文档参照。
 - 很多函数读取全局变量，例如 `generators`、`h[...]`、`Q[...]`、`freefields`、`T`、`J`、`q`、`b`、`cch`。运行前应先在当前 kernel 中建立这些定义。
 - `Declare` 写入的自由场列表变量名是 `freeFundFields`，但 `ListRelations` 的部分规则读取 `freefields`。如果你的计算依赖 relation 搜索，请确认两者是否都按预期定义。
-- `ListOpsAtPartition` 调用 `LettersAtWeight[part]`，而本文件中公开定义的是 `ListLettersAtWeight`。如果加载链没有额外定义 `LettersAtWeight[n]`，需要先补别名或手动确认该函数可用。
+- `ListLettersAtWeight[0]` 当前返回 `{One}`，与早期返回空列表 `{}` 的行为不同。固定权重枚举中的单位算符由 `One` 表示，`ListOpsAtPartition` 和 `ListOpsAtWeight` 的输出中 `NO[]` 也会被替换为 `One`。
 - `ListOpsAtWeight` 使用半整数分拆 `1/2 IntegerPartitions[2n]`，所以可以处理整数或半整数 conformal weight。
 - `CheckStrongClosure` 中的候选空间来自全局 `generators`。如果传入的第一个参数和全局 `generators` 不一致，候选空间可能不是你想要的空间。
 - `ZhuRecursion` 的输出是符号表达式，不等同于自动求解模微分方程；它负责把 trace 表达式按脚本内置递推规则重写。

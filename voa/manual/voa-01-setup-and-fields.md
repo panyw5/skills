@@ -14,7 +14,7 @@ Import["freeFieldVOA.m"]
 SetOptions[EvaluationNotebook[], CommonDefaultFormatTypes -> {"Output" -> StandardForm}]
 ```
 
-因此它默认在 Mathematica notebook 环境中使用，并假设运行时能在当前目录找到 `freeFieldVOA.m`。若在命令行 kernel 或 wolframscript 中加载，需要确保当前路径和依赖文件位置正确。当前手册的 `scripts/` 目录列出了 `VOA.wls` 和 `OPEdefs.wls`，但没有列出 `freeFieldVOA.m`；实际运行时需要补齐这个依赖。
+因此它默认在 Mathematica notebook 环境中使用，并假设运行时能在当前目录找到 `freeFieldVOA.m`。若在命令行 kernel 或 wolframscript 中加载，需要确保当前路径和依赖文件位置正确。当前手册的 `scripts/` 目录已包含 [freeFieldVOA.m](scripts/freeFieldVOA.m)，它由 `VOA.wls` 在启动时通过 `Import["freeFieldVOA.m"]` 导入。命令行环境中使用时，需确保 `VOA.wls`、`freeFieldVOA.m` 以及 `freeFieldVOA.m` 内部导入的 `OPEdefs.m` 运行时文件位置正确或调整导入路径。
 
 常见加载形式：
 
@@ -23,6 +23,49 @@ Get["/path/to/VOA.wls"]
 ```
 
 注意：`VOA.wls` 是自动生成文件。文件头说明它来自 notebook initialization cells，保存 notebook 时会重新生成；不要直接把长期修改写在 `.wls` 文件里。
+
+---
+
+## `freeFieldVOA.m` 运行时角色
+
+`freeFieldVOA.m` 是 `VOA.wls` 导入的运行时脚本，提供自由场实现所需的符号和函数。它内部导入底层 `OPEdefs.m` 作为 OPE 引擎（本技能文档同时也保留了 `OPEdefs.wls` 作为 OPE 引擎的文档源文件；用户应保持运行时文件同目录放置或相应调整导入路径）。
+
+### 场识别
+
+| 函数 | 用途 |
+| --- | --- |
+| `IsFundField[expr]` | 判断一个符号是否已被注册为基本场 |
+| `IsExpField[expr]` | 判断表达式是否为指数场或顶点算子类型 |
+| `IsFreeField[expr]` | 判断表达式是否属于自由场体系 |
+
+### 算符与场转换
+
+| 函数 | 用途 |
+| --- | --- |
+| `Op[{...}]` | 运行时内部的自由场因子包装，列表中保存带坐标的场因子 |
+| `Make[expr]` / `MakeOp[expr]` | 把自由场表达式包装成 `Op[...]` 后做 `NOFree` 标准化 |
+| `MakeField[expr][z]` | 给自由场表达式补上坐标变量，是 `OPEFull` 等函数的前置依赖 |
+
+### 正规序与收缩
+
+| 函数 | 用途 |
+| --- | --- |
+| `NOFree[expr]` | 合并并排序 `Op[...]` 中的自由场因子，用于自由场正规序标准化 |
+| `Contraction[A, B]` / `FullContraction[A, B]` | 计算自由场收缩并递归合并无收缩项，用于 Wick 展开 |
+
+### 自由场 OPE
+
+| 函数 | 用途 |
+| --- | --- |
+| `OPEFree[A, B][z, w][order]` | 计算两个自由场表达式的 OPE 级数并返回场表达式 |
+| `OPEFreeCoefficient[A, B][order]` | 提取自由场 OPE 级数中指定阶数的系数 |
+| `NOC[A, B]` | 提取两个自由场表达式的正规序项系数 |
+
+### 泊松括号（经典极限）
+
+| 函数 | 用途 |
+| --- | --- |
+| `PB[A, B]` | 按 `coord` 与 `\CapitalOmega` 矩阵计算自由场经典泊松括号 |
 
 ---
 

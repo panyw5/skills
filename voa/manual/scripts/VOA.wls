@@ -247,38 +247,71 @@ OPEFree[o1/V1,o2/V2][z,w][-leadingPowerOfVertexOPE]*vertexFullOPE//Series[#,{z,w
 
 (* ::Input::Initialization:: *)
 Clear[ListLettersAtWeight,ListOpsAtPartition,ListOpsAtWeight]
-LettersAtWeight[0]={};
+ListLettersAtWeight[0]={One};
 (* \:5217\:4e3e\:6240\:6709 weight = n \:7684 letters *)
 (* e.g., \:5982\:679c T\[Element]generators \:662f\:4e00\:4e2a\:62bd\:8c61\:751f\:6210\:5143 h[T] = 2 \:7684\:8bdd\:ff0c
-\:90a3\:4e48 LettersAtWeight[4] \:5c31\:4f1a\:5305\:542b T^\[Prime], NO[T,T] *)
+\:90a3\:4e48 ListLettersAtWeight[4] \:5c31\:4f1a\:5305\:542b T^\[Prime], NO[T,T] *)
 
-ListLettersAtWeight[n_,generators_:generators]:=Table[If[IntegerQ[n-h[g]]&&n>=h[g],Derivative[n-h[g]][g],{}],{g,generators}]//Flatten
+ListLettersAtWeight[n_,generators_:generators]:=Table[If[IntegerQ[n-h[g]]&&n>=h[g],Derivative[n-h[g]][g],{}],{g,generators}]/.NO[]->One//Flatten
 (* for partition {n1,n2, ...}, return operators of the form NO[Subscript[O, h=n1],Subscript[O, h=n2], ...] *)
 (* OPEPosition[g\[Element]generators] should return Integer *)
-ListOpsAtPartition[partition_List,generators_:generators]:=Outer[$NO,Sequence@@Table[LettersAtWeight[part],{part,partition}]]/.$NO[l__]:>$NO@@SortBy[List[l],OPEPosition]/.$NO->NO//Flatten//DeleteDuplicates//DeleteCases[#,0]&;
+ListOpsAtPartition[partition_List,generators_:generators]:=Outer[$NO,Sequence@@Table[ListLettersAtWeight[part],{part,partition}]]/.$NO[l__]:>$NO@@SortBy[List[l],OPEPosition]/.$NO->NO//Flatten//DeleteDuplicates//DeleteCases[#,0]&;
 
 (* return a list of operators at conformal weight n built from GLOBAL generators *)
 Clear[ListOpsAtWeight]
-ListOpsAtWeight[n_:(_Rational|_Integer),generators_:generators]:=Table[ListOpsAtPartition[partition],{partition,1/2 IntegerPartitions[2n]}]//Flatten
+ListOpsAtWeight[n_:(_Rational|_Integer),generators_:generators]:=Table[ListOpsAtPartition[partition],{partition,1/2 IntegerPartitions[2n]}]/.NO[]->One//Flatten
 
 
 (* ::Input::Initialization:: *)
-Clear[CheckStrongClosure]
-(*\:68c0\:67e5 realized \:751f\:6210\:5143\:4e4b\:95f4\:7684 OPE \:5c01\:95ed\:ff1b\:5982\:679c\:5c01\:95ed\:ff0c\:5e94\:8be5\:8f93\:51fa\:5168\:662f {{i,j,k},0}*)
-(*\:8f93\:51fa\:4e2d\:7684 OPEresult \:5305\:542b\:4e86\:6240\:6709\:7684 OPEData*)
-CheckStrongClosure[generators_,realization_,printResult_:False]:=Module[{i,j,n,aaa,candidates,result,diff,eq,closure,sols,sol,OPEresult},closure=True;
-(*\:9010\:4e00\:5217\:4e3e \:7b97\:7b26\:5bf9\:ff1b\:7531\:4e8e OPEdefs.m \:7684\:8bbe\:8ba1\:ff0c\:5148\:58f0\:660e\:7684\:7b97\:7b26\:5e94\:8be5\:653e\:5de6\:8fb9*)(*\:6211\:4eec\:5047\:8bbe \:5168\:5c40\:53d8\:91cf generators \:91cc\:9762\:7684\:7b97\:7b26\:6392\:5e8f\:8ddf\:58f0\:660e\:987a\:5e8f\:76f8\:7b26*)For[i=1,i<Length[generators]+1,i++,For[j=i+1,j<Length[generators]+1,j++,(*n \:6807\:8bb0 n \:9636\:6781\:70b9*)For[n=1,n<=h[generators[[i]]]+h[generators[[j]]],n++,(*\:80fd\:591f\:7528\:4e8e\:7ed9\:51fa\:6781\:70b9\:7684\:7b97\:7b26 (\:5177\:6709\:76f8\:540c conformal weight)*)candidates=ListOpsAtWeight[h[generators[[i]]]+h[generators[[j]]]-n];
-(*\:8ba1\:7b97\:6781\:70b9\:8ddf candidates \:7ebf\:6027\:7ec4\:5408\:7684\:5dee\:503c*)diff=OPEPole[n][OPE[generators[[i]]/. realization,generators[[j]]/. realization]]-Array[aaa,Length[candidates]] . candidates;
-(*\:7ebf\:6027\:7ec4\:5408\:4e2d\:4ee3\:5165 realization\:ff0c\:5e76\:6309\:7167 NO \:7ed3\:6784\:5408\:5e76\:540c\:7c7b\:9879*)diff=diff/. realization//.{NO[x_]:>x,NO[]->One}//Collect[#,{NO[___],One}]&;
-(*NO \:524d\:7684\:7cfb\:6570 \:5e94\:5f53==0\:ff0c\:6c42\:89e3\:7ebf\:6027\:65b9\:7a0b\:7ec4*)eq=If[TrueQ[Head[diff]==Plus],(List@@diff)/. {One->1,NO[___]:>1},diff/. {One->1,NO[___]:>1}];
+CheckStrongClosure[generators_,realization_,printResult_:False]:=Module[{i,j,n,aaa,result,diff,eq,closure,sols,sol,OPEresult,candidates},
+closure=True;
+For[i=1,i<Length[generators]+1,i++,
+For[j=i,j<Length[generators]+1,j++,
+
+(* n \:6807\:8bb0 n \:9636\:6781\:70b9 *)
+For[n=1,n<=h[generators[[i]]]+h[generators[[j]]],n++,
+
+candidates=ListOpsAtWeight[h[generators[[i]]]+h[generators[[j]]]-n];
+PrintDebug["----------"];
+PrintDebug["candidates = ",candidates];
+
+
+diff=OPEPole[n][OPE[generators[[i]]/.realization,generators[[j]]/.realization]]-(Array[aaa,Length[candidates]] . candidates/.realization);
+
+PrintDebug[generators[[i]],",",generators[[j]]];
+PrintDebug[OPE[generators[[i]]/.realization,generators[[j]]/.realization]//OPESimplify];
+PrintDebug["target = ",OPEPole[n][OPE[generators[[i]]/.realization,generators[[j]]/.realization]]//OPESimplify];
+
+(* \:9ed8\:8ba4\:8bbe\:7f6e\:51fd\:6570\:5173\:7cfb NO[] *)
+diff=diff//.{NO[]->One}//Collect[#,{NO[_,_],One}~Join~freefields~Join~Table[Derivative[n_][g],{g,freefields}]]&;
+
+eq=If[TrueQ[Head[diff]==Plus],
+
+(List@@diff)/.NO[x_,y_]:>1/.Table[g->One,{g,freefields}]/.{One->1},
+
+diff/.NO[x_,y_]:>1/.Table[g->One,{g,freefields}]/.{One->1}];
+
+
 sols=Solve[eq==0];
 If[Length[sols]==0,closure=False];
 sol=sols[[1]];
-(*\:9a8c\:8bc1\:7ebf\:6027\:7ec4\:5408\:7684\:89e3\:662f\:5426\:7b26\:5408\:8981\:6c42\:ff1adiff \:5e94\:5f53==0*)diff=OPEPole[n][OPE[generators[[i]]/. realization,generators[[j]]/. realization]]-Array[aaa,Length[candidates]] . candidates/. sol/. realization/. {NO[x_]:>x,NO[]->One}//Expand;
-(*\:6536\:96c6\:89e3\:4fe1\:606f\:65b9\:4fbf\:4ee5\:540e\:4f7f\:7528*)result[i,j,n]={{i,j,n},Array[aaa,Length[candidates]] . candidates/. sol/. aaa[_]:>0}];
-(*\:8bb0\:5f97\:8981 Reverse\:ff0cOPEData \:5de6\:8fb9\:662f\:9ad8\:9636\:6781\:70b9\:ff0c\:53f3\:8fb9\:662f\:4f4e\:9636\:6781\:70b9*)OPEresult[i,j]=OPEData[Table[result[i,j,n][[2]],{n,h[generators[[i]]]+h[generators[[j]]]}]//Reverse];
-If[printResult,Print[OPEresult[i,j]]]]];
-{closure,OPEresult}]
+PrintDebug["n = ",n,","," sol=",Array[aaa,Length[candidates]] . candidates/.sol/.aaa[_]:>0];
+
+diff=OPEPole[n][OPE[generators[[i]]/.realization,generators[[j]]/.realization]]-Array[aaa,Length[candidates]] . candidates/.sol/.realization/.{NO[x_]:>x,NO[]->One}//Expand;
+
+result[i,j,n]={{i,j,n},Array[aaa,Length[candidates]] . candidates/.sol/.aaa[_]:>0}
+];
+
+(* \:8bb0\:5f97\:8981 Reverse\:ff0cOPEData \:5de6\:8fb9\:662f\:9ad8\:9636\:6781\:70b9\:ff0c\:53f3\:8fb9\:662f\:4f4e\:9636\:6781\:70b9 *)
+OPEresult[i,j]=OPEData[Table[result[i,j,n][[2]],{n,1,h[generators[[i]]]+h[generators[[j]]]}]//Reverse];
+If[printResult,Print[OPEresult[i,j]]]
+
+]
+];
+
+
+{closure,OPEresult}
+]
 
 
 (* ::Input::Initialization:: *)
@@ -421,10 +454,13 @@ str[o[NO[A_,B_]]]:>KroneckerDelta[Q[A],0]str[o[A]**o[B]]+Sum[EEE[k][{
 
 str[o[T]**o[op___]]:>qDq[str[o[op]]//Expand],
 str[o[J]**o[op___]]:>DDbi[1][1,str[o[op]]//Expand],
+str[o[NO[]]**x_]:>str[x],
+str[x_**o[NO[]]]:>str[x],
 
 str[o[T]]->qDq[cch],
 str[o[J]]->DDbi[1][1,cch],
-str[o[One]]->cch
+str[o[One]]->cch,
+str[o[NO[]]]->cch
 
 
 };

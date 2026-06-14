@@ -7,8 +7,16 @@ compatibility: wolframscript
 
 # `wolframscript` coding convention
 
-- **CRITICAL**: 多行表达式必须用括号 `()` 括起来作为一个整体
-   否则 `wolframscript` 可能会误解表达式的结构，将第二行以及之后的行当成新的表达式，导致语法错误或计算错误
+- **CRITICAL**: **多行表达式**必须用括号 `()` 括起来作为一个整体否则 `wolframscript` 可能会误解表达式的结构，将第二行以及之后的行当成新的表达式，导致语法错误或计算错误。
+  例子
+  ```Mathematica
+
+  expression = (
+  a
+  + b
+  )
+
+  ```
 - 函数要用**中括号** `[arg1, arg2, ...]` 包裹 arguments
 - **WARNING**: 变量名、argument 名字**不能**加下划线 (下划线代表 `pattern`)
 - 优先使用模式匹配 (pattern matching) 和替换规则 (replacement) 进行数学变换
@@ -23,7 +31,7 @@ GetDirectory[NotebookDirectory[]]
 
 
 列表用**花括号**包裹，列表元素用双中括号 ``[[i, j, k, ...]]`` 引用
-```
+```Mathematica
 list = {a, b, {c, d, {e,f,g}}}
 ```
 

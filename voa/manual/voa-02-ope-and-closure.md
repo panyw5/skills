@@ -141,7 +141,7 @@ CheckStrongClosure[generators, realization, printResult_: False]
 
 ### 检查逻辑
 
-对每对生成元 `generators[[i]]`、`generators[[j]]`，脚本依次检查每个可能极点 `n`：
+对每对生成元 `generators[[i]]`、`generators[[j]]`（包含 $i=j$ 的自 OPE，当前循环为 `For[j=i, ...]`），脚本依次检查每个可能极点 `n`：
 
 ```wolfram
 For[n = 1, n <= h[generators[[i]]] + h[generators[[j]]], n++, ...]
@@ -163,10 +163,10 @@ candidates = ListOpsAtWeight[h[generators[[i]]] + h[generators[[j]]] - n]
 
 ```wolfram
 OPEPole[n][OPE[generators[[i]] /. realization, generators[[j]] /. realization]]
-  - Array[aaa, Length[candidates]] . candidates
+  - (Array[aaa, Length[candidates]] . candidates /. realization)
 ```
 
-这里的 `realization` 把抽象生成元替换成自由场或其他已知表达式。若某个极点不能表示为候选空间的线性组合，`closure` 会被置为 `False`。
+这里 ansatz 中的 `candidates` 也通过 `realization` 被替换为自由场表达式，形成完全 realized 的线性方程。若某个极点不能表示为候选空间的线性组合，`closure` 会被置为 `False`。
 
 ### 使用骨架
 
@@ -189,7 +189,8 @@ realization = {
 ## 重要注意
 
 - `CheckStrongClosure` 的第一个参数名也是 `generators`，但 `ListOpsAtWeight` 默认读取全局 `generators`。实际使用时，应确保传入列表与全局 `generators` 一致。
-- `CheckStrongClosure` 内部只遍历 `i < j` 的生成元对，不检查自 OPE。若你的闭合性问题依赖 `A` 与 `A` 的 OPE，需要单独检查或扩展循环。
+- `CheckStrongClosure` 的循环从 `For[j=i, ...]` 开始，因此 $i=j$ 的自 OPE 也被包括在内，即会检查每个生成元与自身的 OPE 闭合性。
+- 如果设置了 `printResult=True`，脚本会打印构造出的 `OPEresult[i, j]` 数据。此外，在函数内部还使用了 `PrintDebug` 输出详细的中间信息，包括分隔线、候选算符列表、当前生成元对、目标 OPE 内容以及求解出的 ansatz。`PrintDebug` 是一个可由用户自定义或静默的符号：在 notebook 环境中可定义为 `PrintDebug[___] := Print[...]`，也可定义为 `PrintDebug[___] := Null` 来关闭详细输出。
 - `Solve` 若无解，脚本会把 `closure` 设为 `False`。如果表达式未充分化简，可能导致本来存在的线性表示没有被识别；这时应先对 realization 后的表达式使用合适的简化规则。
 - `OPEresult[i, j]` 以 `OPEData[...]` 存储，并且脚本在构造时对极点列表执行 `Reverse`，以匹配底层 OPE 数据的高阶极点到低阶极点顺序。
 - `Completion` 依赖 `h[...]` 返回可用于求和上界的数值或符号值；实际计算中通常需要具体 conformal weight。
