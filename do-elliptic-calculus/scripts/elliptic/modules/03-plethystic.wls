@@ -44,3 +44,22 @@ rule$[k_]:=rule$[k]=Table[aList[[i]]->aList[[i]]^k,{i,Length[aList]}];
 Series[(1-q) Sum[MoebiusMu[k]/k Log[((f//Normal)/.{q->q^k}/.rule$[k])],{k,1,2order}],{q,0,order}]//PowerExpand
 ];
 
+
+(* ::Input::Initialization:: *)
+Clear[QPochhammerToTheta];
+QPochhammerToTheta[f_]:=Module[{n,$q},
+f//.{
+QPochhammer[x_. a[1]^(n_/;n<0),$q_]:>\[CurlyTheta][1][-n \[ScriptA][1]-1/(2\[Pi] I) Log[x],$q]/(-I $q^(1/8) (1/(x a[1]^n))^(1/2) QPochhammer[$q,$q]QPochhammer[1/(x (a[1]^n) ) $q,$q]),
+QPochhammer[$q_ x_,$q_]:>QPochhammer[x,$q]/(1-x),
+QPochhammer[q_,q_]:>q^(-(1/24)) \[Eta]\[Eta][q],
+QPochhammer[$q_,$q_^n_]:>QPochhammer[$q,$q]/Product[QPochhammer[$q^k,$q^n],{k,2,n}]
+}];
+
+QPochhammerToTheta[f_,a_,\[ScriptA]_]:=Module[{n,$q},
+f//.{
+QPochhammer[x_. a^(n_/;n<0),$q_]:>\[CurlyTheta][1][-n \[ScriptA]-1/(2\[Pi] I) Log[x],$q]/(-I $q^(1/8) (1/(x a^n))^(1/2) QPochhammer[$q,$q]QPochhammer[1/(x (a^n) ) $q,$q]),
+QPochhammer[$q_ x_,$q_]:>QPochhammer[x,$q]/(1-x),
+QPochhammer[q_,q_]:>q^(-(1/24)) \[Eta]\[Eta][q],
+QPochhammer[$q_,$q_^n_]:>QPochhammer[$q,$q]/Product[QPochhammer[$q^k,$q^n],{k,2,n}]
+}];
+

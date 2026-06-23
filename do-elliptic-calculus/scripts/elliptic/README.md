@@ -60,21 +60,21 @@ Mathematica/Wolfram Language library for symbolic computations involving ellipti
 
 | File | Lines | Purpose |
 |------|-------|---------|
-| 00-globals.wls | 47 | Global configuration |
+| 00-globals.wls | 52 | Global configuration |
 | 01-series-utils.wls | 72 | Series utilities |
 | 02-series-solvers.wls | 99 | Equation solvers |
-| 03-plethystic.wls | 46 | Plethystic operations |
+| 03-plethystic.wls | 65 | Plethystic operations |
 | 04-eisenstein.wls | 180 | Eisenstein series |
 | 05-eisenstein-theta.wls | 121 | E→θ conversion |
 | 06-theta-eisenstein-rules.wls | 168 | θ→E conversion |
-| 07-theta-functions.wls | 135 | Theta functions |
+| 07-theta-functions.wls | 366 | Theta functions |
 | 08-special-functions.wls | 112 | ℘, η functions |
 | 09-abstract-series.wls | 145 | Symbol→series |
 | 10-modular-operators.wls | 131 | Modular operators |
 | 11-physical-voa.wls | 53 | VOA quantities |
 | 12-fmlde.wls | 93 | FMLDE generation |
 | 13-simplify.wls | 26 | Simplification |
-| 14-qshift.wls | 589 | Shift operations |
+| 14-qshift.wls | 595 | Shift operations |
 | 15-dtau-to-dz.wls | 38 | Derivative conversion |
 | 16-modular-transforms.wls | 377 | S,T transforms |
 | 17-mde-transforms.wls | 289 | MDE transforms |
@@ -91,9 +91,10 @@ Mathematica/Wolfram Language library for symbolic computations involving ellipti
 - `maxDerivativeOrder` - Maximum derivative order (default: 20)
 - `$Assumptions` - Global assumptions for symbolic simplification
 - `$debug$` - Debug print flag
+- `$depth$` - Optional indentation depth for nested debug output
 
 **Key Functions**:
-- `PrintDebug[f]` - Conditional debug printing
+- `PrintDebug[f]` - Conditional debug printing; when `$depth$>0` prepends `$depth$` bullet markers for nested-call visualization
 - `TypeOfPole` - Classify poles of elliptic functions (real vs imaginary)
 - `PM` - Plus/minus sign based on pole type
 
@@ -142,7 +143,7 @@ Mathematica/Wolfram Language library for symbolic computations involving ellipti
 ---
 
 ### 03-plethystic.wls
-**Purpose**: Plethystic exponential and logarithm operations
+**Purpose**: Plethystic exponential and logarithm operations, and q-Pochhammer → theta conversion
 
 **Key Functions**:
 
@@ -151,6 +152,8 @@ Mathematica/Wolfram Language library for symbolic computations involving ellipti
 | `PE[X][q]` | Plethystic exponential of X |
 | `PE0[x]` | Leading term (order 0) of PE |
 | `PLog[f][aList][q]` | Plethystic logarithm using Möbius inversion |
+| `QPochhammerToTheta[f]` | Convert q-Pochhammer symbols involving `a[1]` into $\vartheta_1$ and $\eta$ functions |
+| `QPochhammerToTheta[f, a, \[ScriptA]]` | Same conversion with an explicit fugacity `a` / script variable `\[ScriptA]` |
 
 
 ---
@@ -217,19 +220,46 @@ $$
 ---
 
 ### 07-theta-functions.wls
-**Purpose**: Jacobi theta function definitions and series expansions
+**Purpose**: Jacobi theta function definitions, series expansions (including the $z=\lambda\tau$ and $z+\lambda\tau$ branches), and symbolic residue computation via the jet/Laurent framework
 
 **Key Functions**:
 
 | Function | Description |
 |----------|-------------|
+| `\[Theta]SSeriesData[qvar, pairs, order]` | Helper: build `SeriesData` from `{power, coefficient}` pairs (supports rational powers) |
 | `ThetaS[i][z, q, order]` | Explicit q-series for $\theta_i(z,q)$ |
+| `ThetaS[i][\[Lambda] Log[q], q^n, order]` | Direct series construction when $z=\lambda\tau$ (i.e. $z=\lambda\log q$), valid for $|2\pi\lambda|<n/2$ |
+| `ThetaS[i][\[ScriptZ]+\[Lambda] Log[q], q^n, order]` | Same, with an additional $\mathcal{Z}$ offset in the argument |
 | `ThetaAlphaBeta[α,β][z,q]` | General theta with characteristics |
 | `Theta[i][z,q]` | Alias for `EllipticTheta[i, πz, q^(1/2)]` |
 | `ThetazTau[i][z,τ]` | Theta with nome $e^{2\pi i \tau}$ |
 | `Dτ[f]` | τ-derivative: $\frac{1}{2\pi i} \frac{\partial}{\partial \tau}$ |
-| `TakeResidue[f][z, z0]` | Symbolic residue computation |
-| `TakeGeneralResidue[f, {z, z0, m}]` | Residue for m-th order pole |
+| `ThetaDerivativeSymbol[n]` | Construct the abstract symbol $\vartheta^{(n)}$ for the n-th z-derivative of theta |
+| `ThetaDerivativeOrder[sym]` | Recover derivative order n from a $\vartheta^{(n)}$ symbol (counts `p` characters) |
+| `ThetaJetTerm[baseOrder, i, arg, q, eps, extraOrder]` | Build a local jet (Taylor) term of $\vartheta_i$ around `eps=0` up to `extraOrder` |
+| `ThetaDerivativeJetRules[eps, extraOrder]` | Replacement rules mapping $\vartheta^{(n)}_i(\text{arg},q) \to$ jet expansion |
+| `ThetaJetRules[eps, jetOrder]` | Full rules for $\vartheta_i$ and all derivatives $\to$ local jet expansion |
+| `ThetaLocalJet[expr, eps, jetOrder]` | Compute the local jet series of `expr` in `eps` up to `jetOrder` |
+| `ThetaResidueSimplify[expr]` | Post-processing: `MakeAbstract` + `simplify` + $\vartheta_1'(0,q)\to 2\pi\eta^3$ + $e^{c\tau}\to q^{c/(2\pi i)}$ + `PowerExpand` |
+| `ThetaDependsQ[expr, eps]` | Check whether `expr` depends on `eps` |
+| `ThetaSeriesAssociation[expr, eps, minPow, maxPow]` | Convert a Laurent expansion into an `Association` `power -> coefficient` |
+| `ThetaFactorMinPowerLowerBound[expr, eps]` | Lower bound on the minimal power of `eps` in a single factor's Laurent expansion |
+| `ThetaProductWindow[expr, eps, target]` | Compute the truncation window `{minPow, maxPow}` for the product Laurent expansion |
+| `ThetaFactorLaurent[factor, eps, minPow, maxPow]` | Laurent series of one factor as an `Association` |
+| `ThetaConvolveAssociations[a, b, minPow, maxPow]` | Convolve two Laurent-series Associations to get the product's coefficients |
+| `ThetaProductCoefficient[expr, eps, target, minPow, maxPow]` | Specific Laurent coefficient of a product via factor-by-factor convolution |
+| `ThetaResidueShifted[f, {z, pole}, eps]` | Shift `f` to `pole+eps`, apply `qShift`, `RemoveLog`, `\[CurlyTheta]Expand` |
+| `ThetaResidueShifted[f, {z, pole, m}, eps]` | Same, with the higher-order-pole prefactor $(z-\text{pole})^{m-1}(-1)^{m-1}/(m-1)!$ |
+| `ThetaResiduePlan[f, poleSpec]` | Analyze shifted expression, compute `jetLeaves`, choose method (`v1` or `v3`), build plan |
+| `ThetaResidueApplyPlan[plan]` | Execute plan: dispatch to `v1` (Jet) or `v3` (Laurent convolution), extract residue |
+| `TakeResidue[f, {z, pole}]` | **New**: residue at simple pole via `ThetaResiduePlan`+`ApplyPlan`; rewrites $\vartheta_2,\vartheta_3\to\vartheta_1$ first |
+| `TakeResidueOld[f, {z, pole}]` | **Legacy**: residue at simple pole via `MakeTheta`+`SeriesCoefficient` (retained for comparison) |
+| `TakeGeneralResidue[f, {z, pole, m}]` | Residue at m-th order pole (legacy `MakeTheta` route) |
+| `FastThetaResidue[f, {z, pole}]` | Fast residue at simple pole via `ThetaLocalJet` |
+| `FastThetaResidue[f, {z, pole, m}]` | Fast residue at m-th order pole via `ThetaLocalJet` with `jetOrder=m-1` |
+| `FastThetaGeneralResidueLegacy[f, {z, pole, m}]` | Legacy fast residue with the higher-order prefactor applied |
+| `FastThetaResidueV1`, `FastThetaGeneralResidueLegacyV1` | Aliases pinning the `v1` (Jet) method |
+| `FastThetaResidueV3`, `FastThetaGeneralResidueLegacyV3` | Aliases pinning the `v3` (Laurent convolution) method |
 | `CapitalTheta[r,s][q]` | $\Gamma^0(2)$ modular forms |
 | `CapitalThetaS[r,s][q]` | Series version of CapitalTheta |
 
@@ -237,6 +267,11 @@ $$
 $$
 \theta_1(z,q) = 2\sum_{r=0}^{\infty} (-1)^r \sin((2r+1)\pi z) q^{(2r+1)^2/8}
 $$
+
+**Residue Method Selection** (empirical, from benchmark):
+- `ThetaResiduePlan` picks `v1` (Jet) when `jetLeaves >= 2200`, otherwise `v3` (Laurent convolution).
+
+**Runtime Dependencies**: The residue helpers (`TakeResidue`, `FastThetaResidue*`, `ThetaResidueShifted`) call `qShift` and `\[CurlyTheta]Expand` from [14-qshift.wls](modules/14-qshift.wls) at evaluation time. Load order (07 before 14) is safe because these symbols are only resolved when the residue functions are actually invoked, by which point module 14 has been loaded.
 
 ---
 
@@ -366,6 +401,7 @@ $$
 | `qShift[f]` | Main shift function (handles all cases) |
 | `qShiftInteger[f]` | Integer shifts only |
 | `qShift0[f]` | Simplified version (better performance) |
+| `qShiftToTheta1[f]` | Apply `qShift` then rewrite $\vartheta_2(\mathcal{Z},q^n)\to -\vartheta_1(\mathcal{Z}-1/2,q^n)$ and $\vartheta_3(\mathcal{Z},q^n)\to -e^{-i\pi\mathcal{Z}+i\pi n\tau/4}\,\vartheta_1(\mathcal{Z}-(n\tau/2+1/2),q^n)$ |
 | `ThetaExpand[f]` | Expand theta arguments |
 | `CurlyThetaExpand[f]` | Alias for ThetaExpand |
 | `CurlyThetaDerivativeToCurlyThetaP[f]` | Convert Derivative to θp notation |
@@ -377,6 +413,8 @@ $$
 $$
 \theta_1(z+\tau, q) = -e^{-\pi i(2z+\tau)}\theta_1(z,q)
 $$
+
+**Bug Fix**: `FlipSignAll\[ScriptA]` and `FlipSignAll\[ScriptA]Reversed` now correctly apply `FlipSign` with the bare `\[ScriptA]` at the end (previously incorrectly used `\[ScriptB]`).
 
 **Dependencies**: [04-eisenstein.wls](modules/04-eisenstein.wls), [07-theta-functions.wls](modules/07-theta-functions.wls)
 
@@ -512,6 +550,48 @@ sResult = STransForm[expr];
 tResult = TTransForm[expr];
 ```
 
+### 6. q-Pochhammer to Theta Conversion
+
+```wolfram
+ (* Convert a q-Pochhammer factor involving the fugacity a[1] into theta functions *)
+ expr = QPochhammer[a[1]^-1, q];
+ thetaExpr = QPochhammerToTheta[expr];
+
+ (* With an explicit (named) fugacity a and script variable \[ScriptA] *)
+ thetaExpr2 = QPochhammerToTheta[QPochhammer[a^-2, q], a, \[ScriptA]];
+ ```
+
+### 7. Symbolic Residue Computation (jet/Laurent framework)
+
+```wolfram
+ (* Residue at a simple pole *)
+ expr = \[CurlyTheta]p[1][\[ScriptZ], q]/\[CurlyTheta][1][\[ScriptZ], q];
+ res = TakeResidue[expr, {\[ScriptZ], 0}];
+
+ (* Residue at an m-th order pole (use the explicit-order signature) *)
+ expr2 = 1/\[CurlyTheta][1][\[ScriptZ], q]^2;
+ res2 = FastThetaResidue[expr2, {\[ScriptZ], 0, 2}];
+
+ (* Inspect which method the planner chose for a given expression *)
+ plan = ThetaResiduePlan[expr, {\[ScriptZ], 0}];
+ Print["method = ", plan["method"], ", jetLeaves = ", plan["jetLeaves"]];
+
+ (* Force a specific method variant *)
+ resV1 = FastThetaResidueV1[expr, {\[ScriptZ], 0}];
+ resV3 = FastThetaResidueV3[expr, {\[ScriptZ], 0}];
+ ```
+
+### 8. Theta Series at z = λ τ
+
+```wolfram
+(* Direct SeriesData construction when the argument is z = λ Log[q] *)
+(* Valid for |2 π λ| < n/2 when the nome is q^n *)
+order = 6;
+s = \[Theta]S[3][0 Log[q], q, order];
+(* Same with an extra \[ScriptZ] offset *)
+s2 = \[Theta]S[3][\[ScriptZ] + (1/4) Log[q], q, order];
+```
+
 ## Global Variables
 
 | Variable | Default | Description |
@@ -519,6 +599,7 @@ tResult = TTransForm[expr];
 | `order` | 0 | Truncation order for q-series |
 | `maxDerivativeOrder` | 20 | Maximum theta derivative order |
 | `$debug$` | False | Enable debug printing |
+| `$depth$` | unset | Optional indentation depth for nested `PrintDebug` output |
 | `$Assumptions` | Complex assumptions | Symbolic simplification assumptions |
 
 ## Notation Conventions
@@ -526,6 +607,7 @@ tResult = TTransForm[expr];
 ### Theta Functions
 - `Theta[i][z, q]` - Jacobi theta with built-in `EllipticTheta`
 - `ThetaS[i][z, q, order]` - Explicit q-series
+- `ThetaS[i][\[Lambda] Log[q], q^n, order]` - Direct `SeriesData` when $z=\lambda\tau$ (requires $|2\pi\lambda|<n/2$)
 - `ThetaAlphaBeta[α,β][z,q]` - General theta with characteristics
 
 ### Eisenstein Series
@@ -539,8 +621,16 @@ tResult = TTransForm[expr];
 - `Thetap[i][z,q]` - $\theta_i'(z,q)$
 - `Thetapp[i][z,q]` - $\theta_i''(z,q)$
 - `Thetappp[i][z,q]` - $\theta_i'''(z,q)$
+- `ThetaDerivativeSymbol[n]` - Abstract symbol $\vartheta^{(n)}$ for the n-th z-derivative
 
 ### Modular Operators
 - `MDO[k, f]` - Modular differential operator $\mathcal{D}_q^{(k)}$
 - `MMDO[k, ch]` - Abstract version (for symbolic manipulation)
 - `SerreD[k, f]` - Serre derivative
+
+### q-Pochhammer and Residue
+- `QPochhammerToTheta[f]` / `QPochhammerToTheta[f, a, \[ScriptA]]` - Convert $(a;q)_\infty$-type factors into $\vartheta_1$ / $\eta$ expressions
+- `TakeResidue[f, {z, pole}]` - Residue at a simple pole (jet/Laurent framework; rewrites $\vartheta_2,\vartheta_3\to\vartheta_1$ first)
+- `TakeResidueOld[f, {z, pole}]` - Legacy residue via `MakeTheta`+`SeriesCoefficient`
+- `FastThetaResidue[f, {z, pole}]` / `FastThetaResidue[f, {z, pole, m}]` - Fast residue via `ThetaLocalJet`
+- `ThetaResiduePlan` / `ThetaResidueApplyPlan` - Plan-and-apply residue pipeline with automatic `v1`/`v3` method dispatch

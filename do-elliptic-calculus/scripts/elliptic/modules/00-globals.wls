@@ -33,7 +33,12 @@ $debug$=False;
 
 
 (* ::Input::Initialization:: *)
-PrintDebug[f___]:=If[$debug$,Print[f]]
+PrintDebug[f___]:=If[$debug$,
+If[TrueQ[$depth$>0],
+Print@@Join[ConstantArray["\[Bullet] ",$depth$],List[f]],
+Print[f]
+]
+]
 
 
 (* ::Input::Initialization:: *)

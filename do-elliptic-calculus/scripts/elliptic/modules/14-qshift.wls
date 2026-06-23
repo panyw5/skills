@@ -4,7 +4,7 @@
 (* ====================================================================== *)
 
 (* qshift only recognize nome q  *)
-Clear[qShift,qShiftInteger];
+Clear[qShift,qShiftTo\[CurlyTheta]1,qShiftInteger];
 
 qShift[f_]:=Module[{\[Alpha]\[Beta],\[CurlyTheta]ps,shiftfn,IntegerShift,FractionalLargeShift,FractionalSmallShift,EisensteinHalfIntegerShift,result,$ZERO,AddZero,qRescale,qRescaled,$w,w,DEFER,EisensteinNonHalfIntegerShift,qq},
 \[Alpha]\[Beta][1]={1,1};\[Alpha]\[Beta][2]={1,0};\[Alpha]\[Beta][3]={0,0};\[Alpha]\[Beta][4]={0,1};\[CurlyTheta]ps[pnum_]:=Symbol[StringJoin@@("\[CurlyTheta]"<>ConstantArray["p",pnum])];
@@ -332,8 +332,14 @@ EEE[k_][{
  {y}
 }/.$q->$q^n][$q^n]
 });
-result//\[CurlyTheta]DerivativeTo\[CurlyTheta]p
+ result//\[CurlyTheta]DerivativeTo\[CurlyTheta]p
 ];
+
+
+qShiftTo\[CurlyTheta]1[f_]:=(f//qShift)/.{
+\[CurlyTheta][2][\[ScriptZ]_,q^n_.]:>-\[CurlyTheta][1][\[ScriptZ]-1/2,q^n],
+\[CurlyTheta][3][\[ScriptZ]_,q^n_.]:>-E^(-I \[Pi] \[ScriptZ]+(I \[Pi] n \[Tau])/4)\[CurlyTheta][1][\[ScriptZ]-((n \[Tau])/2+1/2),q^n]
+}
 
 
 qShiftInteger[f_]:=Module[{\[CurlyTheta]ps,shiftfn,\[Alpha]\[Beta],\[Epsilon],integerShiftRules},
@@ -488,7 +494,7 @@ shiftfn[i_][n_,m_][z_,q_]:=shiftfn[i][n,m][z,q]=(-1)^(n \[Alpha]\[Beta][i][[1]]-
 (* ::Input::Initialization:: *)
 Clear[\[Theta]Expand,\[CurlyTheta]Expand];
 
-\[Theta]Expand[f_]:=Block[{\[CurlyTheta]ps,expansionRules,EExpand},
+\[Theta]Expand[f_]:=Block[{\[CurlyTheta]ps,expansionRules,EExpand,z,pnum,q},
 
 \[CurlyTheta]ps[pnum_]:=Symbol[StringJoin@@("\[CurlyTheta]"<>ConstantArray["p",pnum])];
 
@@ -500,7 +506,7 @@ f/.expansionRules/.EExpand->Expand
 Expand\[CurlyTheta]=\[CurlyTheta]Expand;
 
 
-\[CurlyTheta]pTo\[CurlyTheta]Derivative[f_]:=Block[{\[CurlyTheta]ps},
+\[CurlyTheta]pTo\[CurlyTheta]Derivative[f_]:=Block[{\[CurlyTheta]ps,q,z,$w},
 
 \[CurlyTheta]ps[pnum_]:=Symbol[StringJoin@@("\[CurlyTheta]"<>ConstantArray["p",pnum])];
 
@@ -520,7 +526,7 @@ f//.{Derivative[n_,0][\[CurlyTheta][i_]][z_,q_]:>\[CurlyTheta]ps[n][i][z,q]}]
 Clear[FlipSign,FlipSignAll,
 FlipSignAll\[ScriptA],FlipSignAlla,FlipSignAll\[ScriptA]Reversed,FlipSignAllaReversed,
 FlipSignAllb,FlipSignAllbReversed,FlipSignAll\[ScriptB],FlipSignAll\[ScriptB]Reversed]
-FlipSign[f_][var_]:=Block[{\[CurlyTheta]ps,pnum,signRules,x},
+FlipSign[f_][var_]:=Block[{\[CurlyTheta]ps,pnum,signRules,x,\[Alpha],\[Lambda]},
 \[CurlyTheta]ps[pnum_]:=Symbol[StringJoin@@("\[CurlyTheta]"<>ConstantArray["p",pnum])];
 signRules=(Table[\[CurlyTheta]ps[pnum][i][\[Lambda]_ var,q_]/;\[Lambda]<0:>Evaluate[(-1)^pnum \[CurlyTheta]ps[pnum][i][-\[Lambda] var,q]],{pnum,0,maxDerivativeOrder},{i,2,4}]~Join~
 Table[\[CurlyTheta]ps[pnum][i][\[Lambda]_ var,q_]/;\[Lambda]<0:>Evaluate[(-1)^(pnum+1) \[CurlyTheta]ps[pnum][i][-\[Lambda] var,q]],{pnum,0,maxDerivativeOrder},{i,1,1}]~Join~
@@ -581,8 +587,8 @@ FlipSignAll\[ScriptB]Reversed[f_]:=Fold[#2[#1]&,f,Table[With[{i=i},FlipSign[#,\[
 FlipSignAllb[f_]:=Fold[#2[#1]&,f,Table[With[{i=i},FlipSign[#,b[i]]&],{i,10}]]//FlipSign[#][b]&;
 FlipSignAllbReversed[f_]:=Fold[#2[#1]&,f,Table[With[{i=i},FlipSign[#,b[i]]&],{i,10}]//Reverse]//FlipSign[#][b]&;
 
-FlipSignAll\[ScriptA][f_]:=Fold[#2[#1]&,f,Table[With[{i=i},FlipSign[#,\[ScriptA][i]]&],{i,10}]]//FlipSign[#][\[ScriptB]]&;
-FlipSignAll\[ScriptA]Reversed[f_]:=Fold[#2[#1]&,f,Table[With[{i=i},FlipSign[#,\[ScriptA][i]]&],{i,10}]//Reverse]//FlipSign[#][\[ScriptB]]&;
+FlipSignAll\[ScriptA][f_]:=Fold[#2[#1]&,f,Table[With[{i=i},FlipSign[#,\[ScriptA][i]]&],{i,10}]]//FlipSign[#][\[ScriptA]]&;
+FlipSignAll\[ScriptA]Reversed[f_]:=Fold[#2[#1]&,f,Table[With[{i=i},FlipSign[#,\[ScriptA][i]]&],{i,10}]//Reverse]//FlipSign[#][\[ScriptA]]&;
 
 FlipSignAlla[f_]:=Fold[#2[#1]&,f,Table[With[{i=i},FlipSign[#,a[i]]&],{i,10}]]//FlipSign[#][a]&;
 FlipSignAllaReversed[f_]:=Fold[#2[#1]&,f,Table[With[{i=i},FlipSign[#,a[i]]&],{i,10}]//Reverse]//FlipSign[#][a]&;

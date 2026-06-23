@@ -28,7 +28,12 @@ $debug$=False;
 
 
 (* ::Input::Initialization:: *)
-PrintDebug[f___]:=If[$debug$,Print[f]]
+PrintDebug[f___]:=If[$debug$,
+If[TrueQ[$depth$>0],
+Print@@Join[ConstantArray["\[Bullet] ",$depth$],List[f]],
+Print[f]
+]
+]
 
 
 (* ::Input::Initialization:: *)
@@ -249,6 +254,25 @@ PLog[f_][aList_][q]:=Module[{rule$},
 rule$[k_]:=rule$[k]=Table[aList[[i]]->aList[[i]]^k,{i,Length[aList]}];
 Series[(1-q) Sum[MoebiusMu[k]/k Log[((f//Normal)/.{q->q^k}/.rule$[k])],{k,1,2order}],{q,0,order}]//PowerExpand
 ];
+
+
+(* ::Input::Initialization:: *)
+Clear[QPochhammerToTheta];
+QPochhammerToTheta[f_]:=Module[{n,$q},
+f//.{
+QPochhammer[x_. a[1]^(n_/;n<0),$q_]:>\[CurlyTheta][1][-n \[ScriptA][1]-1/(2\[Pi] I) Log[x],$q]/(-I $q^(1/8) (1/(x a[1]^n))^(1/2) QPochhammer[$q,$q]QPochhammer[1/(x (a[1]^n) ) $q,$q]),
+QPochhammer[$q_ x_,$q_]:>QPochhammer[x,$q]/(1-x),
+QPochhammer[q_,q_]:>q^(-(1/24)) \[Eta]\[Eta][q],
+QPochhammer[$q_,$q_^n_]:>QPochhammer[$q,$q]/Product[QPochhammer[$q^k,$q^n],{k,2,n}]
+}];
+
+QPochhammerToTheta[f_,a_,\[ScriptA]_]:=Module[{n,$q},
+f//.{
+QPochhammer[x_. a^(n_/;n<0),$q_]:>\[CurlyTheta][1][-n \[ScriptA]-1/(2\[Pi] I) Log[x],$q]/(-I $q^(1/8) (1/(x a^n))^(1/2) QPochhammer[$q,$q]QPochhammer[1/(x (a^n) ) $q,$q]),
+QPochhammer[$q_ x_,$q_]:>QPochhammer[x,$q]/(1-x),
+QPochhammer[q_,q_]:>q^(-(1/24)) \[Eta]\[Eta][q],
+QPochhammer[$q_,$q_^n_]:>QPochhammer[$q,$q]/Product[QPochhammer[$q^k,$q^n],{k,2,n}]
+}];
 
 
 (* ::Input::Initialization:: *)
@@ -943,21 +967,153 @@ D\[Tau][f_]:=2\[Pi] I q D[f,q];
 
 (* ::Input::Initialization:: *)
 (* perform symbolic residue computation of ratios of \[CurlyTheta][i][\[ScriptZ],q] *)
-Clear[TakeResidue,TakeGeneralResidue]
+Clear[TakeResidueOld,TakeGeneralResidue]
 
 (* deal with simple pole *)
-TakeResidue[f_][\[ScriptA]_,\[ScriptA]pole_]:=Module[{\[Epsilon],fShifted},
+TakeResidueOld[f_][\[ScriptA]_,\[ScriptA]pole_]:=Module[{\[Epsilon],fShifted},
 fShifted=f/.{\[ScriptA]->\[Epsilon]+\[ScriptA]pole}//qShift//RemoveLog;
 (* All \[CurlyTheta] that vanish at \[ScriptA]pole will all turn into \[CurlyTheta][1][n \[Epsilon],q], which can be handled by EllipticTheta[1] series expansion *)
 2\[Pi] I(fShifted//MakeTheta//SeriesCoefficient[#,{\[Epsilon],0,-1}]&//makeAbstract)/.{E^(k_ \[Tau]):>q^(k/(2\[Pi] I))}/.{\[CurlyTheta]p[1][0,q_]:>(2\[Pi])\[Eta]\[Eta][q]^3}//PowerExpand
 ];
 
-TakeResidue[f_,{\[ScriptA]_,\[ScriptA]pole_}]:=TakeResidue[f][\[ScriptA],\[ScriptA]pole];
+TakeResidueOld[f_,{\[ScriptA]_,\[ScriptA]pole_}]:=TakeResidueOld[f][\[ScriptA],\[ScriptA]pole];
 
 (* deal with higher order pole *)
 TakeGeneralResidue[f_,{\[ScriptZ]_,\[ScriptZ]pole_,m_}]:=Module[{$\[Epsilon]},
 2\[Pi] I((\[ScriptZ]-\[ScriptZ]pole)^(m-1) *(-1)^(m-1)/(m-1)! f/.{\[ScriptZ]->\[ScriptZ]pole+$\[Epsilon]}//qShift//Simplify//MakeTheta//SeriesCoefficient[#,{$\[Epsilon],0,-1}]&//MakeAbstract//simplify)/.{\[CurlyTheta]p[1][0,q_]:>(2 \[Pi]) \[Eta]\[Eta][q]^3}
 ];
+
+
+(* ::Input::Initialization:: *)
+Clear[FastThetaResidue,ThetaLocalJet,ThetaJetRules,ThetaDerivativeSymbol,ThetaDerivativeOrder,ThetaDerivativeJetRules,ThetaResidueSimplify];
+
+(*ThetaDerivativeSymbol:construct symbol for n-th derivative of theta*)
+ThetaDerivativeSymbol[n_Integer]:=Symbol[StringJoin@@("\[CurlyTheta]"<>ConstantArray["p",n])];
+(*ThetaJetTerm:construct local jet term for theta with derivatives up to extraOrder*)
+ThetaJetTerm[baseOrder_Integer,i_,arg_,qq_,eps_,extraOrder_Integer]:=Module[{arg0,delta},arg0=arg/. eps->0;
+delta=arg-arg0;
+ThetaDerivativeSymbol[baseOrder][i][arg0,qq]+Sum[ThetaDerivativeSymbol[baseOrder+k][i][arg0,qq]*delta^k/k!,{k,1,extraOrder}]];
+(*ThetaDerivativeOrder:extract derivative order from theta derivative symbol (count'p' characters)*)
+ThetaDerivativeOrder[sym_Symbol]:=Module[{name,chars},name=SymbolName[Unevaluated[sym]];
+If[StringTake[name,UpTo[1]]=!="\[CurlyTheta]",Return[Missing["NotThetaDerivative"]]];
+chars=Characters[name];
+Count[Rest[chars],"p"]];
+(*ThetaDerivativeJetRules:generate replacement rules for theta derivatives->jet expansion*)
+ThetaDerivativeJetRules[eps_,extraOrder_Integer]:=Module[{rules},rules=Table[With[{head=ThetaDerivativeSymbol[derOrder],offset=derOrder},{HoldPattern[Power[head[i_][arg_,qq_],n_Integer?Negative]]:>Power[ThetaJetTerm[offset,i,arg,qq,eps,extraOrder],n],HoldPattern[head[i_][arg_,qq_]]:>ThetaJetTerm[offset,i,arg,qq,eps,extraOrder]}],{derOrder,1,maxDerivativeOrder}];
+Flatten[rules]];
+(*ThetaResidueSimplify:post-processing simplification (abstract theta,apply boundary values,power expand)*)
+ThetaResidueSimplify[expr_]:=Module[{tmp},tmp=expr//MakeAbstract//simplify;
+tmp=tmp/. {\[CurlyTheta]p[1][0,qq_]:>2 \[Pi] \[Eta]\[Eta][qq]^3};
+tmp=tmp/. {E^(coef_. \[Tau]):>q^(coef/(2 \[Pi] I))};
+tmp//PowerExpand];
+(*ThetaJetRules:full replacement rules for theta and derivatives->local jet expansion*)
+ThetaJetRules[eps_,jetOrder_Integer]:=Module[{extraOrder,thetaRules},extraOrder=jetOrder+6;
+thetaRules={HoldPattern[Power[\[Theta][i_][arg_,qq_],n_Integer?Negative]]:>Power[ThetaJetTerm[0,i,arg,qq,eps,extraOrder],n],HoldPattern[\[Theta][i_][arg_,qq_]]:>ThetaJetTerm[0,i,arg,qq,eps,extraOrder],HoldPattern[Power[\[CurlyTheta][i_][arg_,qq_],n_Integer?Negative]]:>Power[ThetaJetTerm[0,i,arg,qq,eps,extraOrder],n],HoldPattern[\[CurlyTheta][i_][arg_,qq_]]:>ThetaJetTerm[0,i,arg,qq,eps,extraOrder]};
+Join[thetaRules,ThetaDerivativeJetRules[eps,extraOrder]]];
+(*ThetaLocalJet:compute local jet series expansion of expr around eps=0 up to jetOrder*)
+ThetaLocalJet[expr_,eps_,jetOrder_Integer]:=Module[{jet},jet=expr/. ThetaJetRules[eps,jetOrder];
+jet=jet//MakeAbstract//simplify;
+Series[jet,{eps,0,jetOrder}]//Normal//PowerExpand];
+FastThetaResidue[f_,{zvar_,zpole_}]:=Module[{eps,shifted,localSeries,residue,\[Epsilon]fast},eps=\[Epsilon]fast;
+shifted=(f/. {zvar->zpole+eps})//qShift//RemoveLog//\[CurlyTheta]Expand;
+localSeries=ThetaLocalJet[shifted,eps,0];
+residue=2 \[Pi] I SeriesCoefficient[localSeries,{eps,0,-1}];
+ThetaResidueSimplify[residue]];
+FastThetaResidue[f_,{zvar_,zpole_,poleOrder_Integer?Positive}]:=Module[{eps,shifted,jetOrder,localSeries,residue,\[Epsilon]fast},eps=\[Epsilon]fast;
+jetOrder=poleOrder-1;
+shifted=(f/. {zvar->zpole+eps})//qShift//RemoveLog//\[CurlyTheta]Expand;
+localSeries=ThetaLocalJet[shifted,eps,jetOrder];
+residue=2 \[Pi] I SeriesCoefficient[localSeries,{eps,0,-1}];
+ThetaResidueSimplify[residue]];
+FastThetaGeneralResidueLegacy[f_,{zvar_,zpole_,poleOrder_Integer?Positive}]:=Module[{eps,shifted,localSeries,residue,\[Epsilon]fast},eps=\[Epsilon]fast;
+shifted=((zvar-zpole)^(poleOrder-1)*(-1)^(poleOrder-1)/(poleOrder-1)!*f/. {zvar->zpole+eps})//qShift//RemoveLog//\[CurlyTheta]Expand;
+localSeries=ThetaLocalJet[shifted,eps,0];
+residue=2 \[Pi] I SeriesCoefficient[localSeries,{eps,0,-1}];
+ThetaResidueSimplify[residue]];
+(*ThetaLocalJetV1:alias for ThetaLocalJet (v1 method)*)
+ThetaLocalJetV1=ThetaLocalJet;
+FastThetaGeneralResidueLegacyV1=FastThetaGeneralResidueLegacy;
+FastThetaResidueV1=FastThetaResidue;
+FastThetaGeneralResidueLegacyV1=FastThetaGeneralResidueLegacy;
+FastThetaResidueV1=FastThetaResidue;
+Clear[ThetaFactorLaurent,ThetaDependsQ,ThetaSeriesAssociation,ThetaFactorMinPowerLowerBound,ThetaProductWindow,ThetaConvolveAssociations,ThetaProductCoefficient,FastThetaGeneralResidueLegacyV3,FastThetaResidueV3];
+(*ThetaDependsQ:check if expr depends on variable eps*)
+ThetaDependsQ[expr_,eps_]:=!FreeQ[expr,eps];
+(*ThetaSeriesAssociation:convert Laurent series to Association (power->coefficient)*)
+ThetaSeriesAssociation[expr_,eps_,minPow_Integer,maxPow_Integer]:=Module[{expanded,pairs},expanded=expr//PowerExpand//Expand;
+pairs=Table[k->Coefficient[expanded,eps,k],{k,minPow,maxPow}];
+Association[DeleteCases[pairs,_->0]]];
+(*ThetaFactorMinPowerLowerBound:compute lower bound of minimal power in Laurent expansion*)
+ThetaFactorMinPowerLowerBound[expr_,eps_]/;!ThetaDependsQ[expr,eps]:=0;
+ThetaFactorMinPowerLowerBound[eps_,eps_]:=1;
+ThetaFactorMinPowerLowerBound[Power[base_,n_Integer],eps_]:=n*ThetaFactorMinPowerLowerBound[base,eps];
+ThetaFactorMinPowerLowerBound[Times[terms__],eps_]:=Total[ThetaFactorMinPowerLowerBound[#,eps]&/@{terms}];
+ThetaFactorMinPowerLowerBound[Plus[terms__],eps_]:=Min[ThetaFactorMinPowerLowerBound[#,eps]&/@{terms}];
+ThetaFactorMinPowerLowerBound[(\[Theta]|\[CurlyTheta])[i_][arg_,qq_],eps_]:=If[((arg/. eps->0)===0)&&i===1,1,0];
+ThetaFactorMinPowerLowerBound[head_Symbol[i_][arg_,qq_],eps_]/;IntegerQ[ThetaDerivativeOrder[head]]:=Module[{arg0,derivOrder},arg0=arg/. eps->0;
+derivOrder=ThetaDerivativeOrder[head];
+If[arg0=!=0,0,If[i===1,If[EvenQ[derivOrder],1,0],If[OddQ[derivOrder],1,0]]]];
+ThetaFactorMinPowerLowerBound[expr_,eps_]:=0;
+(*ThetaProductWindow:compute truncation window for product Laurent expansion*)
+ThetaProductWindow[expr_,eps_,target_Integer]:=Module[{factors,factorMinPows,totalMin},factors=If[Head[expr]===Times,List@@expr,{expr}];
+factorMinPows=ThetaFactorMinPowerLowerBound[#,eps]&/@factors;
+totalMin=Total[factorMinPows];
+<|"minPow"->Min[-8,totalMin],"maxPow"->Max[4,target-totalMin+Max[factorMinPows]]|>];
+(*ThetaFactorLaurent:compute Laurent series of a single factor as Association (power->coefficient)*)
+ThetaFactorLaurent[factor_,eps_,minPow_Integer,maxPow_Integer]:=Module[{jet,ser},If[!ThetaDependsQ[factor,eps],Return[<|0->factor|>]];
+jet=factor/. ThetaJetRules[eps,maxPow-minPow+2];
+jet=jet//simplify;
+ser=Quiet[Normal[Series[jet,{eps,0,maxPow}]]];
+ThetaSeriesAssociation[ser,eps,minPow,maxPow]];
+(*ThetaConvolveAssociations:convolve two Laurent series Associations to compute product coefficients*)
+ThetaConvolveAssociations[a_Association,b_Association,minPow_Integer,maxPow_Integer]:=Module[{res,ka,kb,pow,val},res=<||>;
+Do[Do[pow=ka+kb;
+If[minPow<=pow<=maxPow,val=Lookup[res,pow,0]+a[ka] b[kb];
+If[val===0,KeyDropFrom[res,pow],res[pow]=val]],{kb,Keys[b]}],{ka,Keys[a]}];
+res];
+(*ThetaProductCoefficient:compute specific coefficient of product Laurent expansion via factor convolution*)
+ThetaProductCoefficient[expr_,eps_,target_Integer,minPow_Integer,maxPow_Integer]:=Module[{factors,acc,factorAssoc,idx},factors=If[Head[expr]===Times,List@@expr,{expr}];
+acc=<|0->1|>;
+Do[factorAssoc=ThetaFactorLaurent[factors[[idx]],eps,minPow,maxPow];
+acc=ThetaConvolveAssociations[acc,factorAssoc,minPow,maxPow];,{idx,Length[factors]}];
+Lookup[acc,target,0]];
+FastThetaResidueV3[f_,{zvar_,zpole_}]:=Module[{eps,shifted,coeff,window,\[Epsilon]fast},eps=\[Epsilon]fast;
+shifted=(f/. {zvar->zpole+eps})//qShift//RemoveLog//\[CurlyTheta]Expand;
+window=ThetaProductWindow[shifted,eps,-1];
+coeff=ThetaProductCoefficient[shifted,eps,-1,window["minPow"],window["maxPow"]];
+ThetaResidueSimplify[2 \[Pi] I coeff]];
+FastThetaGeneralResidueLegacyV3[f_,{zvar_,zpole_,poleOrder_Integer?Positive}]:=Module[{eps,shifted,coeff,window,\[Epsilon]fast},eps=\[Epsilon]fast;
+shifted=((zvar-zpole)^(poleOrder-1)*(-1)^(poleOrder-1)/(poleOrder-1)!*f/. {zvar->zpole+eps})//qShift//RemoveLog//\[CurlyTheta]Expand;
+window=ThetaProductWindow[shifted,eps,-1];
+coeff=ThetaProductCoefficient[shifted,eps,-1,window["minPow"],window["maxPow"]];
+ThetaResidueSimplify[2 \[Pi] I coeff]];
+(*ThetaResidueShifted:shift f to pole+eps,apply qShift,RemoveLog,ThetaExpand*)
+ThetaResidueShifted[f_,{zvar_,zpole_},eps_]:=((f/. {zvar->zpole+eps})//qShift//RemoveLog//\[CurlyTheta]Expand);
+ThetaResidueShifted[f_,{zvar_,zpole_,poleOrder_Integer?Positive},eps_]:=(((zvar-zpole)^(poleOrder-1)*(-1)^(poleOrder-1)/(poleOrder-1)!*f/. {zvar->zpole+eps})//qShift//RemoveLog//\[CurlyTheta]Expand);
+Clear[ThetaResiduePlan,ThetaResidueApplyPlan];
+
+(*ThetaResiduePlan:analyze shifted expression,compute jetLeaves,choose method (v1 or v3),build plan*)
+ThetaResiduePlan[f_,poleSpec_]:=Module[{eps,shifted,factors,depCount,jetLeaves,method,window,\[Epsilon]plan},eps=\[Epsilon]plan;
+shifted=ThetaResidueShifted[f,poleSpec,eps];
+factors=If[Head[shifted]===Times,List@@shifted,{shifted}];
+depCount=Count[factors,factor_/;ThetaDependsQ[factor,eps]];
+jetLeaves=LeafCount[shifted/. ThetaJetRules[eps,0]];
+(*Empirical rule from large benchmark:v1 wins only in the special high-jetLeaves branch.*)method=If[jetLeaves>=2200,"v1","v3"];
+window=ThetaProductWindow[shifted,eps,-1];
+<|"eps"->eps,"poleSpec"->poleSpec,"shifted"->shifted,"depCount"->depCount,"jetLeaves"->jetLeaves,"method"->method,"window"->window|>];
+
+(*ThetaResidueApplyPlan:execute plan (dispatch to v1 Jet or v3 Laurent method),extract residue coefficient*)
+ThetaResidueApplyPlan[plan_Association]:=Module[{eps,localSeries,coeff,window},eps=plan["eps"];
+If[plan["method"]==="v1",localSeries=ThetaLocalJetV1[plan["shifted"],eps,0];
+coeff=SeriesCoefficient[localSeries,{eps,0,-1}];
+ThetaResidueSimplify[2 \[Pi] I coeff],window=Lookup[plan,"window",ThetaProductWindow[plan["shifted"],eps,-1]];
+coeff=ThetaProductCoefficient[plan["shifted"],eps,-1,window["minPow"],window["maxPow"]];
+ThetaResidueSimplify[2 \[Pi] I coeff]]];
+
+Clear[TakeResidue]
+(*TakeResidue rewrites theta[2] and theta[3] into theta[1] before delegating to ThetaResiduePlan+ThetaResidueApplyPlan.This ensures all vanishing thetas at the pole become theta[1] which has a clean EllipticTheta[1] series expansion.*)
+TakeResidue[f_,{\[ScriptA]_,pole_}]:=ThetaResidueApplyPlan[ThetaResiduePlan[f/.{\[CurlyTheta][2][\[ScriptZ]_,q^n_.]:>-\[CurlyTheta][1][\[ScriptZ]-1/2,q^n],\[CurlyTheta][3][\[ScriptZ]_,q]:>-E^(-I \[Pi] \[ScriptZ]+(I \[Pi] \[Tau])/4)\[CurlyTheta][1][\[ScriptZ]-(\[Tau]/2+1/2),q]},{\[ScriptA],pole}]]
+
 
 
 (* ::Input::Initialization:: *)
@@ -998,7 +1154,7 @@ EEE[k_/;OddQ[k]&&k>1][{
 
 (* ::Input::Initialization:: *)
 (* qshift only recognize nome q  *)
-Clear[qShift,qShiftInteger];
+Clear[qShift,qShiftTo\[CurlyTheta]1,qShiftInteger];
 
 qShift[f_]:=Module[{\[Alpha]\[Beta],\[CurlyTheta]ps,shiftfn,IntegerShift,FractionalLargeShift,FractionalSmallShift,EisensteinHalfIntegerShift,result,$ZERO,AddZero,qRescale,qRescaled,$w,w,DEFER,EisensteinNonHalfIntegerShift,qq},
 \[Alpha]\[Beta][1]={1,1};\[Alpha]\[Beta][2]={1,0};\[Alpha]\[Beta][3]={0,0};\[Alpha]\[Beta][4]={0,1};\[CurlyTheta]ps[pnum_]:=Symbol[StringJoin@@("\[CurlyTheta]"<>ConstantArray["p",pnum])];
@@ -1329,6 +1485,11 @@ EEE[k_][{
 result//\[CurlyTheta]DerivativeTo\[CurlyTheta]p
 ];
 
+qShiftTo\[CurlyTheta]1[f_]:=(f//qShift)/.{
+\[CurlyTheta][2][\[ScriptZ]_,q^n_.]:>-\[CurlyTheta][1][\[ScriptZ]-1/2,q^n],
+\[CurlyTheta][3][\[ScriptZ]_,q^n_.]:>-E^(-I \[Pi] \[ScriptZ]+(I \[Pi] n \[Tau])/4)\[CurlyTheta][1][\[ScriptZ]-((n \[Tau])/2+1/2),q^n]
+}
+
 
 qShiftInteger[f_]:=Module[{\[CurlyTheta]ps,shiftfn,\[Alpha]\[Beta],\[Epsilon],integerShiftRules},
 \[Alpha]\[Beta][1]={1,1};
@@ -1482,7 +1643,7 @@ shiftfn[i_][n_,m_][z_,q_]:=shiftfn[i][n,m][z,q]=(-1)^(n \[Alpha]\[Beta][i][[1]]-
 (* ::Input::Initialization:: *)
 Clear[\[Theta]Expand,\[CurlyTheta]Expand];
 
-\[Theta]Expand[f_]:=Block[{\[CurlyTheta]ps,expansionRules,EExpand},
+\[Theta]Expand[f_]:=Block[{\[CurlyTheta]ps,expansionRules,EExpand,z,pnum,q},
 
 \[CurlyTheta]ps[pnum_]:=Symbol[StringJoin@@("\[CurlyTheta]"<>ConstantArray["p",pnum])];
 
@@ -1494,11 +1655,11 @@ f/.expansionRules/.EExpand->Expand
 Expand\[CurlyTheta]=\[CurlyTheta]Expand;
 
 
-\[CurlyTheta]pTo\[CurlyTheta]Derivative[f_]:=Block[{\[CurlyTheta]ps},
+\[CurlyTheta]pTo\[CurlyTheta]Derivative[f_]:=Block[{\[CurlyTheta]ps,q,z,$w},
 
 \[CurlyTheta]ps[pnum_]:=Symbol[StringJoin@@("\[CurlyTheta]"<>ConstantArray["p",pnum])];
 
-rules=(Table[\[CurlyTheta]ps[pnum][i][z_,q_]:>Evaluate[D[\[CurlyTheta][i][$w,q],{$w,pnum}]]/.{$w->z},{pnum,0,maxDerivativeOrder},{i,1,4}]//Flatten)~Join~{\[CurlyTheta][i_][z_,q]:>Derivative[0,0][\[CurlyTheta][i]][z,q]};
+rules=(Table[\[CurlyTheta]ps[pnum][i][z_,q_]:>Evaluate[D[\[CurlyTheta][i][$w,q],{$w,pnum}]]/.{$w->z},{pnum,0,maxDerivativeOrder},{i,1,4}]//Flatten)~Join~{\[CurlyTheta][i_][z_,q_]:>Derivative[0,0][\[CurlyTheta][i]][z,q]};
 
 f/.rules
 
@@ -1514,7 +1675,7 @@ f//.{Derivative[n_,0][\[CurlyTheta][i_]][z_,q_]:>\[CurlyTheta]ps[n][i][z,q]}]
 Clear[FlipSign,FlipSignAll,
 FlipSignAll\[ScriptA],FlipSignAlla,FlipSignAll\[ScriptA]Reversed,FlipSignAllaReversed,
 FlipSignAllb,FlipSignAllbReversed,FlipSignAll\[ScriptB],FlipSignAll\[ScriptB]Reversed]
-FlipSign[f_][var_]:=Block[{\[CurlyTheta]ps,pnum,signRules,x},
+FlipSign[f_][var_]:=Block[{\[CurlyTheta]ps,pnum,signRules,x,\[Alpha],\[Lambda]},
 \[CurlyTheta]ps[pnum_]:=Symbol[StringJoin@@("\[CurlyTheta]"<>ConstantArray["p",pnum])];
 signRules=(Table[\[CurlyTheta]ps[pnum][i][\[Lambda]_ var,q_]/;\[Lambda]<0:>Evaluate[(-1)^pnum \[CurlyTheta]ps[pnum][i][-\[Lambda] var,q]],{pnum,0,maxDerivativeOrder},{i,2,4}]~Join~
 Table[\[CurlyTheta]ps[pnum][i][\[Lambda]_ var,q_]/;\[Lambda]<0:>Evaluate[(-1)^(pnum+1) \[CurlyTheta]ps[pnum][i][-\[Lambda] var,q]],{pnum,0,maxDerivativeOrder},{i,1,1}]~Join~
@@ -1575,8 +1736,8 @@ FlipSignAll\[ScriptB]Reversed[f_]:=Fold[#2[#1]&,f,Table[With[{i=i},FlipSign[#,\[
 FlipSignAllb[f_]:=Fold[#2[#1]&,f,Table[With[{i=i},FlipSign[#,b[i]]&],{i,10}]]//FlipSign[#][b]&;
 FlipSignAllbReversed[f_]:=Fold[#2[#1]&,f,Table[With[{i=i},FlipSign[#,b[i]]&],{i,10}]//Reverse]//FlipSign[#][b]&;
 
-FlipSignAll\[ScriptA][f_]:=Fold[#2[#1]&,f,Table[With[{i=i},FlipSign[#,\[ScriptA][i]]&],{i,10}]]//FlipSign[#][\[ScriptB]]&;
-FlipSignAll\[ScriptA]Reversed[f_]:=Fold[#2[#1]&,f,Table[With[{i=i},FlipSign[#,\[ScriptA][i]]&],{i,10}]//Reverse]//FlipSign[#][\[ScriptB]]&;
+FlipSignAll\[ScriptA][f_]:=Fold[#2[#1]&,f,Table[With[{i=i},FlipSign[#,\[ScriptA][i]]&],{i,10}]]//FlipSign[#][\[ScriptA]]&;
+FlipSignAll\[ScriptA]Reversed[f_]:=Fold[#2[#1]&,f,Table[With[{i=i},FlipSign[#,\[ScriptA][i]]&],{i,10}]//Reverse]//FlipSign[#][\[ScriptA]]&;
 
 FlipSignAlla[f_]:=Fold[#2[#1]&,f,Table[With[{i=i},FlipSign[#,a[i]]&],{i,10}]]//FlipSign[#][a]&;
 FlipSignAllaReversed[f_]:=Fold[#2[#1]&,f,Table[With[{i=i},FlipSign[#,a[i]]&],{i,10}]//Reverse]//FlipSign[#][a]&;
