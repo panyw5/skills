@@ -74,7 +74,7 @@ Mathematica/Wolfram Language library for symbolic computations involving ellipti
 | 11-physical-voa.wls | 53 | VOA quantities |
 | 12-fmlde.wls | 93 | FMLDE generation |
 | 13-simplify.wls | 26 | Simplification |
-| 14-qshift.wls | 595 | Shift operations |
+| 14-qshift.wls | 642 | Shift operations |
 | 15-dtau-to-dz.wls | 38 | Derivative conversion |
 | 16-modular-transforms.wls | 377 | S,T transforms |
 | 17-mde-transforms.wls | 289 | MDE transforms |
@@ -402,6 +402,8 @@ $$
 | `qShiftInteger[f]` | Integer shifts only |
 | `qShift0[f]` | Simplified version (better performance) |
 | `qShiftToTheta1[f]` | Apply `qShift` then rewrite $\vartheta_2(\mathcal{Z},q^n)\to -\vartheta_1(\mathcal{Z}-1/2,q^n)$ and $\vartheta_3(\mathcal{Z},q^n)\to -e^{-i\pi\mathcal{Z}+i\pi n\tau/4}\,\vartheta_1(\mathcal{Z}-(n\tau/2+1/2),q^n)$ |
+| `ThetaNormalize[expr, z]` | **New**: normalize all Jacobi theta factors to $\vartheta_1$ with canonical shift — extracts integer-period shifts ($k_A,k_B$) as phases and reflects the fractional remainder into the fundamental domain |
+| `ThetaNormalizeFactor[expr, z]` | Internal single-theta decomposition helper for `ThetaNormalize` |
 | `ThetaExpand[f]` | Expand theta arguments |
 | `CurlyThetaExpand[f]` | Alias for ThetaExpand |
 | `CurlyThetaDerivativeToCurlyThetaP[f]` | Convert Derivative to θp notation |
@@ -591,6 +593,17 @@ s = \[Theta]S[3][0 Log[q], q, order];
 (* Same with an extra \[ScriptZ] offset *)
 s2 = \[Theta]S[3][\[ScriptZ] + (1/4) Log[q], q, order];
 ```
+
+### 9. Theta Normalization to $\vartheta_1$
+
+```wolfram
+(* Normalize all theta factors to \[CurlyTheta][1] with canonical shift *)
+(* Extracts integer periods as phases and reflects the remainder into the fundamental domain *)
+expr = \[CurlyTheta][3][\[ScriptZ] + 1/3, q]^2 * \[CurlyTheta][2][\[ScriptZ], q];
+result = ThetaNormalize[expr, \[ScriptZ]];
+```
+
+`ThetaNormalize` is an opt-in utility and does not alter `qShift`/`qShift0`/`qShiftInteger` behavior.
 
 ## Global Variables
 

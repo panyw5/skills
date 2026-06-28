@@ -4,7 +4,7 @@
 (* ====================================================================== *)
 
 (* qshift only recognize nome q  *)
-Clear[qShift,qShiftTo\[CurlyTheta]1,qShiftInteger];
+Clear[qShift,qShiftTo\[CurlyTheta]1,qShiftInteger,ThetaNormalize,ThetaNormalizeFactor];
 
 qShift[f_]:=Module[{\[Alpha]\[Beta],\[CurlyTheta]ps,shiftfn,IntegerShift,FractionalLargeShift,FractionalSmallShift,EisensteinHalfIntegerShift,result,$ZERO,AddZero,qRescale,qRescaled,$w,w,DEFER,EisensteinNonHalfIntegerShift,qq},
 \[Alpha]\[Beta][1]={1,1};\[Alpha]\[Beta][2]={1,0};\[Alpha]\[Beta][3]={0,0};\[Alpha]\[Beta][4]={0,1};\[CurlyTheta]ps[pnum_]:=Symbol[StringJoin@@("\[CurlyTheta]"<>ConstantArray["p",pnum])];
@@ -340,6 +340,53 @@ qShiftTo\[CurlyTheta]1[f_]:=(f//qShift)/.{
 \[CurlyTheta][2][\[ScriptZ]_,q^n_.]:>-\[CurlyTheta][1][\[ScriptZ]-1/2,q^n],
 \[CurlyTheta][3][\[ScriptZ]_,q^n_.]:>-E^(-I \[Pi] \[ScriptZ]+(I \[Pi] n \[Tau])/4)\[CurlyTheta][1][\[ScriptZ]-((n \[Tau])/2+1/2),q^n]
 }
+
+
+(* ThetaNormalize: normalize Jacobi theta factors to \[CurlyTheta][1] with canonical shift.
+   ThetaNormalizeFactor is the internal single-theta decomposition helper.
+   Both are new opt-in utilities; existing qShift/qShift0/qShiftInteger and their callers are untouched. *)
+Clear[ThetaNormalize,ThetaNormalizeFactor];
+
+ThetaNormalizeFactor[expr_, z_]:=Module[{arg,nome,n,i,p,$w,thetaExpr,result,expr2,pre,wShift,dec,nn,cZ,aNew,bNew,kA,kB,a0,b0,thetaArg,zRed,shiftFactor,zzRed,aNeedRefl,bNeedRefl,reflType,zzReflected,reflFactorFunc,nomePow},
+expr2=\[CurlyTheta]pTo\[CurlyTheta]Derivative[expr];
+dec=ReplaceList[expr2,{Derivative[p_,0][\[CurlyTheta][i_]][arg_,nome_]:>{p,i,arg,nome},\[CurlyTheta][i_][arg_,nome_]:>{0,i,arg,nome}}];
+If[Length[dec]===0,Return[expr]];
+{p,i,arg,nome}=dec[[1]];
+nomePow=ReplaceList[nome,{q:>1,Power[q,nn_]/;IntegerQ[nn]&&nn>0:>nn}];
+If[Length[nomePow]>0,n=nomePow[[1]],n=1];
+pre=Switch[i,1,(1&),2,(-1&),3,(-E^(-I Pi #+I Pi n \[Tau]/4)&),4,(-E^(-I Pi (#+1/2)+I Pi n \[Tau]/4)&),_,Return[expr]];
+wShift=Switch[i,1,(#&),2,(#-1/2&),3,(#-n \[Tau]/2-1/2&),4,(#-n \[Tau]/2&),_,Return[expr]];
+thetaArg=wShift[arg];
+cZ=Coefficient[thetaArg,z];
+aNew=(thetaArg/.{z->0,\[Tau]->0});
+bNew=Coefficient[thetaArg,\[Tau]];
+If[NumericQ[aNew],kA=Floor[aNew];a0=aNew-kA;,kA=0;a0=aNew;];
+If[NumericQ[bNew],kB=Floor[bNew/n];b0=bNew-kB*n;,kB=0;b0=bNew;];
+reflType="none";zzReflected=(#&);reflFactorFunc=(1&);
+If[cZ===0&&NumericQ[a0]&&NumericQ[b0],
+  aNeedRefl=(a0>=1/2);
+  bNeedRefl=(b0>=n/2);
+  Which[
+    aNeedRefl&&bNeedRefl,reflType="combined";zzReflected=(1+n \[Tau]-#&);reflFactorFunc=(-E^(I Pi (2-2 #+n \[Tau]))&);,
+    aNeedRefl&&b0===0,reflType="a-only";zzReflected=(1-#&);reflFactorFunc=(1&);,
+    bNeedRefl&&a0===0,reflType="b-only";zzReflected=(n \[Tau]-#&);reflFactorFunc=(E^(I Pi (n \[Tau]-2 #))&);
+  ];
+];
+zzRed=wShift[$w]-kA-kB n \[Tau];
+shiftFactor=(-1)^(kA+kB)*E^(-I Pi kB (2 wShift[$w]-kB n \[Tau]));
+thetaExpr=pre[$w]*shiftFactor*reflFactorFunc[zzRed]*\[CurlyTheta][1][zzReflected[zzRed],nome];
+result=D[thetaExpr,{$w,p}]/.$w->arg;
+\[CurlyTheta]DerivativeTo\[CurlyTheta]p[result]//Expand
+];
+
+ThetaNormalize[expr_, z_:z]:=Module[{exprDeriv,result},
+exprDeriv=\[CurlyTheta]pTo\[CurlyTheta]Derivative[expr];
+result=exprDeriv/.{
+  Derivative[p_,0][\[CurlyTheta][i_]][arg_,nome_]:>ThetaNormalizeFactor[Derivative[p,0][\[CurlyTheta][i]][arg,nome],z],
+  \[CurlyTheta][i_][arg_,nome_]:>ThetaNormalizeFactor[\[CurlyTheta][i][arg,nome],z]
+};
+\[CurlyTheta]DerivativeTo\[CurlyTheta]p[result]//Expand
+];
 
 
 qShiftInteger[f_]:=Module[{\[CurlyTheta]ps,shiftfn,\[Alpha]\[Beta],\[Epsilon],integerShiftRules},
