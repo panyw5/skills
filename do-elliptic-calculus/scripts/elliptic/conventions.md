@@ -63,6 +63,42 @@ $$
 \vartheta_1(\mathfrak{z} + m\tau + n) = (-1)^{m+n} e^{-2\pi i m \mathfrak{z}} q^{-\frac{1}{2}m^2}\vartheta_1(\mathfrak{z})
 $$
 
+### 反射到基本域
+
+针对 nome $q^{n}$ 下的 $\vartheta_1(\mathfrak{z}, q^{n})$，当 argument 不含 $\mathfrak{z}$（即形如 $\alpha + \beta\tau$）时，可利用奇性将 $\alpha, \beta$ 反射到基本域 $\alpha \in [0,\tfrac{1}{2}],\ \beta \in [0,\tfrac{n}{2}]$：
+
+**奇性**（与 nome 无关）：
+
+$$
+\vartheta_1(-\mathfrak{z},\,q^{n}) = -\vartheta_1(\mathfrak{z},\,q^{n})
+$$
+
+**a-反射**（沿 $1$-周期方向，phase $=1$）：
+
+$$
+\vartheta_1(1-\mathfrak{z},\,q^{n}) = \vartheta_1(\mathfrak{z},\,q^{n})
+$$
+
+> 由 $\vartheta_1(\mathfrak{z}+1)=-\vartheta_1(\mathfrak{z})$ 与奇性联立。
+
+**b-反射**（沿 $\tau$-周期方向，针对 nome $q^{n}$）：
+
+$$
+\vartheta_1(n\tau-\mathfrak{z},\,q^{n}) = e^{\pi i\,(n\tau-2\mathfrak{z})}\,\vartheta_1(\mathfrak{z},\,q^{n})
+$$
+
+> 由准周期 $\vartheta_1(\mathfrak{z}+n\tau,q^{n}) = -e^{-\pi i(n\tau+2\mathfrak{z})}\vartheta_1(\mathfrak{z},q^{n})$ 与奇性联立。
+
+**组合反射**（a、b 同时触发）：
+
+$$
+\vartheta_1(1+n\tau-\mathfrak{z},\,q^{n}) = -\,e^{\pi i\,(n\tau-2\mathfrak{z})}\,\vartheta_1(\mathfrak{z},\,q^{n})
+$$
+
+> 组合反射比 b-反射多一个 $(-1)$ 因子，来自 $1$-周期平移的反号；额外 $e^{2\pi i}=1$ 不贡献。
+
+以上即 `ThetaNormalize` / `ThetaNormalizeFactor`（见 [14-qshift.wls](modules/14-qshift.wls)）所实现的反射规则的数学依据。
+
 ### 导数关系
 
 $$
