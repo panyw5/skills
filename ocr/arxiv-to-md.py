@@ -204,6 +204,10 @@ def block_md(node: Tag, base_url: str) -> list[str]:
         )
     if name == "math":
         return [inline_md(node, base_url).strip()]
+    if name == "img":
+        alt = clean_text(node.get("alt") or "")
+        src = node.get("src") or ""
+        return [f"![{alt}]({src})"] if src else []
 
     blocks: list[str] = []
     for child in node.children:
@@ -233,6 +237,9 @@ def main() -> int:
     html_path.write_bytes(html)
     soup = BeautifulSoup(html, "html.parser")
 
+    base_tag = soup.find("base", href=True)
+    asset_base_url = urljoin(args.url, base_tag["href"]) if base_tag else args.url
+
     for unwanted in soup.find_all(["script", "style", "noscript"]):
         unwanted.decompose()
 
@@ -244,7 +251,7 @@ def main() -> int:
         src = src.strip()
         if not src:
             continue
-        abs_url = urljoin(args.url, src)
+        abs_url = urljoin(asset_base_url, src)
         if abs_url not in image_map:
             name = filename_for_url(abs_url, idx)
             target = img_dir / name
@@ -253,7 +260,7 @@ def main() -> int:
         img["src"] = image_map[abs_url]
 
     main = soup.find("article") or soup.find("main") or soup.body or soup
-    blocks = block_md(main, args.url)
+    blocks = block_md(main, asset_base_url)
     title = soup.find("title")
     title_text = clean_text(title.get_text(" ")) if title else f"arXiv {arxiv_id}"
     header = [f"# {title_text}", "", f"Source: {args.url}"]
