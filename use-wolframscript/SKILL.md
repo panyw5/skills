@@ -5,9 +5,9 @@ compatibility: wolframscript
 ---
 
 
-# `wolframscript` coding convention
+# `wolframscript` coding RULES
 
-- **CRITICAL**: **多行表达式**必须用括号 `()` 括起来作为一个整体否则 `wolframscript` 可能会误解表达式的结构，将第二行以及之后的行当成新的表达式，导致语法错误或计算错误。
+- **CRITICAL**: **多行表达式**必须用**括号 `()`** 包裹作为一个整体，否则 `wolframscript` 可能会误解表达式的结构，将第二行以及之后的行当成新的表达式，导致语法错误或计算错误。
   例子
   ```Mathematica
 
@@ -15,18 +15,23 @@ compatibility: wolframscript
   a
   + b
   )
-
   ```
-- 函数要用**中括号** `[arg1, arg2, ...]` 包裹 arguments
+- 函数要用 **中括号** `[arg1, arg2, ...]` 包裹 arguments
 - **WARNING**: 变量名、argument 名字**不能**加下划线 (下划线代表 `pattern`)
-- 优先使用模式匹配 (pattern matching) 和替换规则 (replacement) 进行数学变换
+- **CRITICAL**: **优先使用**模式匹配 (pattern matching) 和替换规则 (replacement) 进行数学变换
+
+- 每次设计 `wolframscript` 脚本，思考并回答如下问题。
+  - 这个问题能否用替换规则实现？
+  - 这个问题是否涉及模式识别？
+  - 是否涉及针对特定结构的变换、替换、结构重组？
+  READ [pattern-and-replacement](pattern-and-replacement.md) for examples
 
 
 # `wolframscript` basics
 
 程序包调用时，可能需要获取当前 `.wls`、`.m` 文件的路径。用
 ```Mathematica
-GetDirectory[NotebookDirectory[]]
+SetDirectory[NotebookDirectory[]]
 ```
 
 
@@ -42,9 +47,10 @@ V = Table[a[i, j] b^i c^j, {i, 4}, {j, 4}](* 用 Table 生成多维列表 *)
 ```
 
 
-函数 arguments 用**中括号**包裹
+函数 arguments 用 **中括号** `[...]` 包裹
 ```Mathematica
 Sin[{{a}, b}] (* 函数名 Sin, argument 是 {{a}, b} *)
+FunctionName[a, b]
 ```
 
 函数、变量可以不加声明直接调用
@@ -70,7 +76,6 @@ x^4 + y^4 + z^4 /. {x^2 -> x2} (* => x^4 + y^4 + z^4 *)
 ```
 
 pattern matching 和替换规则
-
 ```Mathematica
 
 Clear[x, \[Gamma], y]
@@ -148,6 +153,8 @@ f /@ {a, b, c, d, e} (* => f[a], f[b], f[c], f[d], f[e] *)
 ```
 
 `Collect` 的输出抱有加法结构 (是个"多项式")，而 `Simplify` 或者 `FullSymplify` 虽然会化简但会破坏结构
+
+示例如下。
 ```Mathematica
 
 (* 完全化简，破坏加法结构 *)

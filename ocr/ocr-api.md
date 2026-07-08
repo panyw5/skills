@@ -5,7 +5,18 @@
 
 # 本地 pdf 文件 ocr
 
-参考如下示例代码，通过将文件上传到 MinerU 服务器完成 ocr
+根据 `文件名` 进行搜索，确认文件是否 arXiv 论文。根据结果进行如下处理。
+
+## arXiv 论文 ocr
+- 获取 arXiv 论文的 HTML 页面链接 `https://arxiv.org/html/XXXX.XXXXXvX`
+- 参考脚本 [arxiv-to-md](arxiv-to-md.py) 进行下载和转换
+- 下载和转换产物按照上述输出要求重命名和放置
+
+
+## 非 arXiv 论文 ocr
+
+如果未能找到 arXiv 号以及对应的 html 页面，参考如下示例代码，通过将本地文件上传到 MinerU 服务器完成 ocr
+
 ```python
 
 import requests
@@ -57,7 +68,7 @@ curl --location --request POST 'https://mineru.net/api/v4/extract/task' \
     "url": "https://cdn-mineru.openxlab.org.cn/demo/example.pdf",
     "model_version": "vlm"
 }'
-···
+```
 
 # 对 url 指向的 pdf 文件进行 ocr
 

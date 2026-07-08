@@ -10,16 +10,16 @@
 
 ## 文档入口
 
-1. [初始化、场声明与 Lie 代数化简](voa-01-setup-and-fields.md)
+1. [初始化、场声明与 Lie 代数化简](VOA-01-setup-and-fields.md)
    解释如何加载脚本、声明自由场和复合生成元的宇称，并说明 `simplifyLieAlgebra` 中的指标缩并规则。
 
-2. [完整 OPE、极点与强闭合检查](voa-02-ope-and-closure.md)
+2. [完整 OPE、极点与强闭合检查](VOA-02-ope-and-closure.md)
    说明 `OPEFull`、`Bracket`、`Completion` 和 `CheckStrongClosure` 的用途，以及如何用 realization 验证候选强生成元是否闭合。
 
-3. [固定权重算符空间与关系搜索](voa-03-operator-spaces-and-relations.md)
+3. [固定权重算符空间与关系搜索](VOA-03-operator-spaces-and-relations.md)
    说明 `ListLettersAtWeight`、`ListOpsAtPartition`、`ListOpsAtWeight` 与 `ListRelations`，用于构造固定 conformal weight 的正规序算符基底并找线性关系。
 
-4. [Zhu 递推、环面迹与 Eisenstein 化简](voa-04-zhu-recursion.md)
+4. [Zhu 递推、环面迹与 Eisenstein 化简](VOA-04-zhu-recursion.md)
    说明 `ZhuRecursion`、`str`、`o`、`qDq`、`DDbi`、`EEE`、`EEi` 的工作方式，以及递推输出中常见符号的含义。
 
 相关背景文档：
@@ -107,19 +107,19 @@ ZhuRecursion[str[o[NO[A, B]]]]
 
 | 函数 | 用途 | 详见 |
 | --- | --- | --- |
-| `Declare[freefields][bosons][fermions]` | 声明自由场、玻色场和费米场 | [voa-01](voa-01-setup-and-fields.md) |
-| `IsBosonicField[expr]` / `IsFermionicField[expr]` | 判断表达式是否由已声明场构成 | [voa-01](voa-01-setup-and-fields.md) |
-| `MakeVertexField[expr][z]` | 给抽象算符表达式补上坐标变量 | [voa-01](voa-01-setup-and-fields.md) |
-| `simplifyLieAlgebra[expr]` | 化简 Killing form、结构常数和部分仿射流表达式 | [voa-01](voa-01-setup-and-fields.md) |
-| `OPEFull[o1, o2][z, w][n]` | 合并自由场部分和顶点算子部分，计算完整 OPE 级数 | [voa-02](voa-02-ope-and-closure.md) |
-| `Bracket[O1, O2][n]` | 统一表示第 $n$ 阶 OPE 极点、正规序积和负阶正则项 | [voa-02](voa-02-ope-and-closure.md) |
-| `Completion[O1, O2][m]` | 按准初级投影公式组合极点及导数 | [voa-02](voa-02-ope-and-closure.md) |
-| `CheckStrongClosure[generators, realization, printResult]` | 检查 realized generators 的 OPE 是否在抽象生成元空间中闭合 | [voa-02](voa-02-ope-and-closure.md) |
-| `ListLettersAtWeight[n]` | 枚举权重为 $n$ 的单个 letter | [voa-03](voa-03-operator-spaces-and-relations.md) |
-| `ListOpsAtPartition[partition]` | 对给定权重分拆生成正规序复合算符 | [voa-03](voa-03-operator-spaces-and-relations.md) |
-| `ListOpsAtWeight[n]` | 枚举总权重为 $n$ 的复合算符候选基底 | [voa-03](voa-03-operator-spaces-and-relations.md) |
-| `ListRelations[ops]` / `ListRelations[ops, realization]` | 求算符列表中的线性关系 | [voa-03](voa-03-operator-spaces-and-relations.md) |
-| `ZhuRecursion[f]` | 对环面单点迹表达式应用 Zhu 递推和 Eisenstein 化简 | [voa-04](voa-04-zhu-recursion.md) |
+| `Declare[freefields][bosons][fermions]` | 声明自由场、玻色场和费米场 | [VOA-01](VOA-01-setup-and-fields.md) |
+| `IsBosonicField[expr]` / `IsFermionicField[expr]` | 判断表达式是否由已声明场构成 | [VOA-01](VOA-01-setup-and-fields.md) |
+| `MakeVertexField[expr][z]` | 给抽象算符表达式补上坐标变量 | [VOA-01](VOA-01-setup-and-fields.md) |
+| `simplifyLieAlgebra[expr]` | 化简 Killing form、结构常数和部分仿射流表达式 | [VOA-01](VOA-01-setup-and-fields.md) |
+| `OPEFull[o1, o2][z, w][n]` | 合并自由场部分和顶点算子部分，计算完整 OPE 级数 | [VOA-02](VOA-02-ope-and-closure.md) |
+| `Bracket[O1, O2][n]` | 统一表示第 $n$ 阶 OPE 极点、正规序积和负阶正则项 | [VOA-02](VOA-02-ope-and-closure.md) |
+| `Completion[O1, O2][m]` | 按准初级投影公式组合极点及导数 | [VOA-02](VOA-02-ope-and-closure.md) |
+| `CheckStrongClosure[generators, realization, printResult]` | 检查 realized generators 的 OPE 是否在抽象生成元空间中闭合 | [VOA-02](VOA-02-ope-and-closure.md) |
+| `ListLettersAtWeight[n]` | 枚举权重为 $n$ 的单个 letter | [VOA-03](VOA-03-operator-spaces-and-relations.md) |
+| `ListOpsAtPartition[partition]` | 对给定权重分拆生成正规序复合算符 | [VOA-03](VOA-03-operator-spaces-and-relations.md) |
+| `ListOpsAtWeight[n]` | 枚举总权重为 $n$ 的复合算符候选基底 | [VOA-03](VOA-03-operator-spaces-and-relations.md) |
+| `ListRelations[ops]` / `ListRelations[ops, realization]` | 求算符列表中的线性关系 | [VOA-03](VOA-03-operator-spaces-and-relations.md) |
+| `ZhuRecursion[f]` | 对环面单点迹表达式应用 Zhu 递推和 Eisenstein 化简 | [VOA-04](VOA-04-zhu-recursion.md) |
 
 ---
 

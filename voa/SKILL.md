@@ -46,6 +46,31 @@ Zhu's 递归公式: [Zhu-recursion](manual/VOA-recursion.md)
 - 对于物理学家记号 $a(z) = \sum_{n \in \mathbb{Z} - h_a} a_{n} z^{- n - h_a}$，零模 $o(a) = a_0$，对于数学家记号，$o(a) = a_{h_a - 1}$
 
 
+
+# `wls` Coding convention
+1. **CRITICAL**: 多行表达式**必须用括号 `()`** 括起来作为一个整体
+   ```Wolfram
+   var = (term1
+          + term2
+          + term3
+          + ...)
+   ```
+   否则 Wolfram Script 可能会**误解**表达式的结构，将第二行以及之后的行当成新的表达式，导致语法错误或计算错误
+2. 函数要用**中括号** `[arg1, arg2, ...]` 包裹 arguments
+3. **注意**: 变量名、argument 名字**不能**加**下划线**，除非是 `pattern`
+4. 下划线代表 `pattern`，小心使用，例如 `var_` 是一个 pattern，可以匹配任何名字的变量，而 `var` 是一个具体的变量名
+
+
+
+
+# Useful routines
+find **null states** using **free field realization** with `pyope-voa`: [routines/find-null-states](routines/find-null-states.md)
+
+Using Zhu's recursion to compute flavored modular differential equations from a null state using `VOA.wls`: [routines-ZhuRecursion](routines/ZhuRecursion.md)
+
+check OPE closure using `VOA.wls`: [routines-check-ope-closure](routines/check-OPE-closure.md)
+
+
 # `OPEdefs` 索引文件
 优点: 高性能，适用于复杂的 OPE、NO 计算
 [OPEdefs-index](manual/OPEdefs-index.md)
@@ -78,27 +103,13 @@ OPE[B, B] = MakeOPE[{-One, 0}];
 ```
 
 
-## Useful routines
-
-
 # `VOA.wls` 索引文件
-优点: 自由场实现、OPE 展开、固定权重算符空间、强闭合检查、null relation 搜索和 Zhu 递推
+优点: 自由场实现、OPE 展开、固定权重算符空间、OPE closure 检查, Jacobi identity 检查、null relation 搜索和 Zhu's recursion
 
-使用索引与背景: [voa-index](manual/voa-index.md)
+使用索引与背景: [voa-index](manual/VOA-index.md)
 
 源文件: [VOA.wls](manual/scripts/VOA.wls)
 运行时依赖: [freeFieldVOA.m](manual/scripts/freeFieldVOA.m)
-
-**定位**: 面向 Mathematica / Wolfram Language 的 VOA 计算辅助脚本，覆盖自由场实现、完整 OPE 展开、固定权重算符空间枚举、强闭合检查、线性关系搜索和 Zhu 递推。更像一组 notebook 辅助函数，不是独立 package。
-
-**主要功能模块**:
-- 自由场实现与场声明 (`Declare`, field recognition, `MakeVertexField`)
-- 完整 OPE 展开 (`OPEFull`, 自由场 + 顶点算子合并)
-- 固定权重算符空间枚举 (`ListLettersAtWeight`, `ListOpsAtPartition`, `ListOpsAtWeight`)
-- 强闭合检查 (`CheckStrongClosure`)
-- 线性关系搜索 (`ListRelations`)
-- Zhu 递推与环面迹 (`ZhuRecursion`, Eisenstein 化简, `qDq`, `DDbi`)
-
 
 # `pyope-voa` 索引文件
 优点: 功能丰富，附带计算后端切换、Wolfram 批量规范化、Zhu's $C_2$ 代数、Zhu's 代数、有限维结合代数、associate variety、descendant 空间、null states 等功能模块
@@ -128,20 +139,3 @@ OPE[B, B] = MakeOPE[{-One, 0}];
 - 需要研究 `C_2` 商、null states、singularity 约束时，优先查 `GenericC2Reducer`、`QuotientC2NullSearcher`、`SingularVectorAnalyzer`
 
 模块文档的索引: [pyope-index](manual/pyope-index.md)
-
-# `wls` Coding convention
-1. **CRITICAL**: 多行表达式**必须用括号 `()`** 括起来作为一个整体
-   ```Wolfram
-   var = (term1
-          + term2
-          + term3
-          + ...)
-   ```
-   否则 Wolfram Script 可能会**误解**表达式的结构，将第二行以及之后的行当成新的表达式，导致语法错误或计算错误
-2. 函数要用**中括号** `[arg1, arg2, ...]` 包裹 arguments
-3. **注意**: 变量名、argument 名字**不能**加**下划线**，除非是 `pattern`
-4. 下划线代表 `pattern`，小心使用，例如 `var_` 是一个 pattern，可以匹配任何名字的变量，而 `var` 是一个具体的变量名
-
-
-## Useful routines
-find **null states** using **free field realization** with `pyope-voa`: [routines/find-null-states](routines/find-null-states.md)

@@ -15,15 +15,17 @@ meta:
 
 ## Eisenstein Series, and Jacobi Theta Functions, Weierstrass function series, q-Pochhammer symbols, Plethystic exponential
 
-Useful definitions and scripts are available in folder `./scripts/elliptic/`
-- [README](./scripts/elliptic/README.md): overview of the `modules` in `./scripts/elliptic/`
+Useful definitions and scripts are available in folder `scripts/elliptic/`
 - [conventions](./scripts/elliptic/conventions.md): formal definitions, latex conventions, coding conventions, and common identities
+- [README](scripts/elliptic/README.md): overview of the `modules/` in `scripts/elliptic/`
+
+目录 `scripts/identities/` 下有大量 Eisenstein 和 Jacobi theta 函数的恒等式 (identities), 当你需要化简 Jacobi theta、Eisenstein 级数形成的表达式时使用
+
+目录 `routines/` 下有一些日常业务的详细指引
+- 解析围道积分: [integration](routines/analytic-integration.md)
 
 
-目录 [identities](./scripts/identities/) 下有大量 Eisenstein 和 Jacobi theta 函数的恒等式
-
-
-# `wls` coding convention
+# `wls` coding RULEs
 1. **CRITICAL**: 多行表达式必须用括号 `()` 括起来作为一个整体
    否则 `wolframscript` 可能会误解表达式的结构，将第二行以及之后的行当成新的表达式，导致语法错误或计算错误
 2. 函数要用**中括号** `[arg1, arg2, ...]` 包裹 arguments
