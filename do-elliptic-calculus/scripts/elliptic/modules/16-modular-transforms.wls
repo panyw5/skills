@@ -305,7 +305,7 @@ EEE[k_][{
  {E^(Log[x]+y//Together)}
 }][E^(-((2 I \[Pi])/\[Tau]))]
 };
-$result=$result/.{\[Eta]\[Eta][qq_]:>(Sqrt[-I $\[Tau]t]\[Eta]\[Eta][E^(2\[Pi] I $\[Tau]t)]/.{$\[Tau]t->-(1/(2\[Pi] I) Log[qq])^-1}),
+$result=$result/.{\[Eta]\[Eta][qq_]:>\[Eta]ModularDual[\[Eta]\[Eta][qq]],
 \[WeierstrassP]\[WeierstrassP][$\[ScriptB]t_,$qq_]:>($\[Tau]t^2 \[WeierstrassP]\[WeierstrassP][$\[Tau]t $\[ScriptB]t,E^(2\[Pi] I $\[Tau]t)]/.$\[Tau]t->-(1/(2\[Pi] I) Log[$qq])^-1)};
 
 $result=$result/.{

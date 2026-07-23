@@ -92,8 +92,9 @@ LogProductToSumLog[f_]:=f//.{$Log$[$x_Times]:>Total[$Log$[#]&/@List@@$x],$Log$[1
 $Log$[x_^n_]:>n $Log$[x]};
 
 
-makeqSeries[f_Times]:=Module[{result,$b,numerator,denominator,resultLogNumerator,resultLogDenominator,$\[Lambda]$},
+makeqSeries[f_Times]:=Module[{result,numerator,denominator},
 PrintDebug["separating numerator and denominator"];
+PrintDebug["f = ",f];
 
 numerator=Numerator[f];
 denominator=Denominator[f];

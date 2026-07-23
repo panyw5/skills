@@ -119,6 +119,3 @@ $$
 ### 3.2 Quasi-lisse VOA
 
 若强有限生成的 VOA 的 associated variety（视为 Poisson 簇）只有有限多个辛叶 (symplectic leaves)，则称该 VOA 为 **quasi-lisse**。
-
-
-

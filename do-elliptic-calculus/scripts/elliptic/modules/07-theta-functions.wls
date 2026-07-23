@@ -239,7 +239,7 @@ If[StringTake[name,UpTo[1]]=!="\[CurlyTheta]",Return[Missing["NotThetaDerivative
 chars=Characters[name];
 Count[Rest[chars],"p"]];
 (*ThetaDerivativeJetRules:generate replacement rules for theta derivatives->jet expansion*)
-ThetaDerivativeJetRules[eps_,extraOrder_Integer]:=Module[{rules},rules=Table[With[{head=ThetaDerivativeSymbol[derOrd],offset=derOrd},{HoldPattern[Power[head[i_][arg_,qq_],n_Integer?Negative]]:>Power[ThetaJetTerm[offset,i,arg,qq,eps,extraOrder],n],HoldPattern[head[i_][arg_,qq_]]:>ThetaJetTerm[offset,i,arg,qq,eps,extraOrder]}],{derOrd,1,maxDerivativeOrder}];
+ThetaDerivativeJetRules[eps_,extraOrder_Integer]:=Module[{rules},rules=Table[With[{head=ThetaDerivativeSymbol[derOrder],offset=derOrder},{HoldPattern[Power[head[i_][arg_,qq_],n_Integer?Negative]]:>Power[ThetaJetTerm[offset,i,arg,qq,eps,extraOrder],n],HoldPattern[head[i_][arg_,qq_]]:>ThetaJetTerm[offset,i,arg,qq,eps,extraOrder]}],{derOrder,1,maxDerivativeOrder}];
 Flatten[rules]];
 (*ThetaResidueSimplify:post-processing simplification (abstract theta,apply boundary values,power expand)*)
 ThetaResidueSimplify[expr_]:=Module[{tmp},tmp=expr//MakeAbstract//simplify;

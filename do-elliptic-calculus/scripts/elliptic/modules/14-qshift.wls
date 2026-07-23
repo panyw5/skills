@@ -182,7 +182,7 @@ RowBox[{"(",
 RowBox[{"pnum_", ",", "0"}], ")"}],
 Derivative],
 MultilineFunction->None]\)[z_+m_ \[Tau],q]:>(\!\(
-\*SubscriptBox[\(\[PartialD]\), \({w, pnum}\)]\((I\
+\*SubscriptBox[\(\[PartialD]\), \({w, pnum}\)]\((
 \*SuperscriptBox[\(E\), \(\(-\[Pi]\)\ I\ \((w +
 \*FractionBox[\(\[Tau]\), \(4\)])\)\)]\ \(\[CurlyTheta][2]\)[w, q])\)\)/. {w->z+(m-1/2) \[Tau]})/;1/2<=m<1,\!\(\*SuperscriptBox[\(\[CurlyTheta][2]\),
 TagBox[
@@ -190,11 +190,11 @@ RowBox[{"(",
 RowBox[{"pnum_", ",", "0"}], ")"}],
 Derivative],
 MultilineFunction->None]\)[z_+m_ \[Tau],q]:>(\!\(
-\*SubscriptBox[\(\[PartialD]\), \({w, pnum}\)]\((I\
+\*SubscriptBox[\(\[PartialD]\), \({w, pnum}\)]\((
 \*SuperscriptBox[\(E\), \(\(-\[Pi]\)\ I\ \((w +
 \*FractionBox[\(\[Tau]\), \(4\)])\)\)]\ \(\[CurlyTheta][3]\)[w, q])\)\)/. {w->z+(m-1/2) \[Tau]})/;1/2<=m<1,
 
-\[CurlyTheta][1][z_+m_ \[Tau],q]:>(I E^(-\[Pi] I (w+\[Tau]/4)) \[CurlyTheta][4][w,q]/. {w->z+(m-1/2) \[Tau]})/;1/2<=m<1,\[CurlyTheta][4][z_+m_ \[Tau],q]:>(I E^(-\[Pi] I (w+\[Tau]/4)) \[CurlyTheta][1][w,q]/. {w->z+(m-1/2) \[Tau]})/;1/2<=m<1,\[CurlyTheta][3][z_+m_ \[Tau],q]:>(I E^(-\[Pi] I (w+\[Tau]/4)) \[CurlyTheta][2][w,q]/. {w->z+(m-1/2) \[Tau]})/;1/2<=m<1,\[CurlyTheta][2][z_+m_ \[Tau],q]:>(I E^(-\[Pi] I (w+\[Tau]/4)) \[CurlyTheta][3][w,q]/. {w->z+(m-1/2) \[Tau]})/;1/2<=m<1,
+\[CurlyTheta][1][z_+m_ \[Tau],q]:>(I E^(-\[Pi] I (w+\[Tau]/4)) \[CurlyTheta][4][w,q]/. {w->z+(m-1/2) \[Tau]})/;1/2<=m<1,\[CurlyTheta][4][z_+m_ \[Tau],q]:>(I E^(-\[Pi] I (w+\[Tau]/4)) \[CurlyTheta][1][w,q]/. {w->z+(m-1/2) \[Tau]})/;1/2<=m<1,\[CurlyTheta][3][z_+m_ \[Tau],q]:>(E^(-\[Pi] I (w+\[Tau]/4)) \[CurlyTheta][2][w,q]/. {w->z+(m-1/2) \[Tau]})/;1/2<=m<1,\[CurlyTheta][2][z_+m_ \[Tau],q]:>(E^(-\[Pi] I (w+\[Tau]/4)) \[CurlyTheta][3][w,q]/. {w->z+(m-1/2) \[Tau]})/;1/2<=m<1,
 
 \!\(\*SuperscriptBox[\(\[CurlyTheta][1]\),
 TagBox[
@@ -557,7 +557,7 @@ Expand\[CurlyTheta]=\[CurlyTheta]Expand;
 
 \[CurlyTheta]ps[pnum_]:=Symbol[StringJoin@@("\[CurlyTheta]"<>ConstantArray["p",pnum])];
 
-rules=(Table[\[CurlyTheta]ps[pnum][i][z_,q_]:>Evaluate[D[\[CurlyTheta][i][$w,q],{$w,pnum}]]/.{$w->z},{pnum,0,maxDerivativeOrder},{i,1,4}]//Flatten)~Join~{\[CurlyTheta][i_][z_,q]:>Derivative[0,0][\[CurlyTheta][i]][z,q]};
+rules=(Table[\[CurlyTheta]ps[pnum][i][z_,q_]:>Evaluate[D[\[CurlyTheta][i][$w,q],{$w,pnum}]]/.{$w->z},{pnum,0,maxDerivativeOrder},{i,1,4}]//Flatten)~Join~{\[CurlyTheta][i_][z_,q_]:>Derivative[0,0][\[CurlyTheta][i]][z,q]};
 
 f/.rules
 

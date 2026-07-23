@@ -43,17 +43,25 @@ Clear[\[Eta]]
 
 
 (* ::Input::Initialization:: *)
-Clear[\[Eta]S]
+Clear[\[Eta]S,\[Eta]SOld]
 \[Eta]SOld[q_]:=Sum[(Boole[Mod[n,12]==1||Mod[n,12]==11]
 -Boole[Mod[n,12]==5||Mod[n,12]==12-5])q^(1/24 n^2),{n,1,Sqrt[24order]}]//qSeries
 
-\[Eta]S[q_^$p$_Integer]:=SeriesData[q,0,SparseArray[$p$ #^2->Boole[Mod[#,12]==1||Mod[#,12]==11]
--Boole[Mod[#,12]==5||Mod[#,12]==12-5]&/@Range[Floor[Sqrt[24order]]]]//Normal,1,24order,24]
+\[Eta]S[q_^$p$_Integer]:=Module[{$q},
+
+SeriesData[$q,0,SparseArray[$p$ #^2->Boole[Mod[#,12]==1||Mod[#,12]==11]
+-Boole[Mod[#,12]==5||Mod[#,12]==12-5]&/@Range[Floor[Sqrt[24order]]]]//Normal,1,24order,24]/.$q->q
+]
 \[Eta]S[q_^$p$_Rational]:=Module[{$q},
+
 (\[Eta]S[$q]//Normal)/.{$q->q^$p$}//qSeries
 ];
-\[Eta]S[q_]:=SeriesData[q,0,SparseArray[#^2->Boole[Mod[#,12]==1||Mod[#,12]==11]
--Boole[Mod[#,12]==5||Mod[#,12]==12-5]&/@Range[Floor[Sqrt[24order]]]]//Normal,1,24order,24]
+\[Eta]S[q_]:=Module[{$q},
+
+(SeriesData[$q,0,
+(SparseArray[#^2->Boole[Mod[#,12]==1||Mod[#,12]==11]
+-Boole[Mod[#,12]==5||Mod[#,12]==12-5]&/@Range[Floor[Sqrt[24order]]]]//Normal),
+1,24order,24]//Normal)/.$q->q]//PowerExpand//qSeries
 
 
 (* ::Input::Initialization:: *)

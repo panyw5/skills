@@ -66,14 +66,14 @@ Mathematica/Wolfram Language library for symbolic computations involving ellipti
 | 03-plethystic.wls | 65 | Plethystic operations |
 | 04-eisenstein.wls | 180 | Eisenstein series |
 | 05-eisenstein-theta.wls | 121 | E→θ conversion |
-| 06-theta-eisenstein-rules.wls | 168 | θ→E conversion |
+| 06-theta-eisenstein-rules.wls | 190 | θ→E conversion |
 | 07-theta-functions.wls | 366 | Theta functions |
-| 08-special-functions.wls | 112 | ℘, η functions |
-| 09-abstract-series.wls | 145 | Symbol→series |
+| 08-special-functions.wls | 120 | ℘, η functions |
+| 09-abstract-series.wls | 146 | Symbol→series |
 | 10-modular-operators.wls | 131 | Modular operators |
 | 11-physical-voa.wls | 53 | VOA quantities |
 | 12-fmlde.wls | 93 | FMLDE generation |
-| 13-simplify.wls | 26 | Simplification |
+| 13-simplify.wls | 40 | Simplification |
 | 14-qshift.wls | 642 | Shift operations |
 | 15-dtau-to-dz.wls | 38 | Derivative conversion |
 | 16-modular-transforms.wls | 377 | S,T transforms |
@@ -206,9 +206,11 @@ $$
 
 | Function | Description |
 |----------|-------------|
-| `CurlyThetapToEEE` | Cached rules: $\theta^{(n)}_i(0,q) \to E_k$ |
+| `CurlyThetapToEEE` | Cached rules: $\vartheta^{(n)}_i(\mathfrak{z},q) \to E_k$ for **all four** $i=1,2,3,4$ (derivatives up to 11th order) |
 | `Theta0ToEisensteinRule[n]` | Dynamically generate conversion rules |
 | `Theta0ToEisenstein[f]` | Apply theta-to-Eisenstein conversion |
+
+**Note**: `CurlyThetapToEEE` now covers $\vartheta_2$ and $\vartheta_3$ derivative rules in addition to $\vartheta_1,\vartheta_4$; the $\vartheta_2$ family uses characteristics $\left[\begin{smallmatrix}1\\-b\end{smallmatrix}\right]$ and $\vartheta_3$ uses $\left[\begin{smallmatrix}-1\\-b\end{smallmatrix}\right]$ (with $b=e^{2\pi i\mathfrak{z}}$).
 
 **Dependencies**: [04-eisenstein.wls](modules/04-eisenstein.wls), [05-eisenstein-theta.wls](modules/05-eisenstein-theta.wls), [07-theta-functions.wls](modules/07-theta-functions.wls)
 
@@ -287,7 +289,8 @@ $$
 | `WeierstrassPZ[β,q]` | Series expansion in q |
 | `Zeta[z,q]` | Weierstrass ζ function |
 | `Eta[q]` | Dedekind η function: $\eta(\tau) = q^{1/24}\prod(1-q^n)$ |
-| `EtaS[q]` | q-series for η function |
+| `EtaS[q]` | q-series for η function (via `SeriesData`, post-processed with `PowerExpand`/`qSeries`) |
+| `EtaS[q^n]` | Integer/rational nome-power overloads $\eta(n\tau)$ built directly as `SeriesData` |
 | `Pfn[q]`, `Qfn[q]`, `Rfn[q]` | Eisenstein-related invariants |
 | `P[m][{α},{b}][z,q]` | Generalized P-function |
 
@@ -388,6 +391,8 @@ $$
 - $\theta_1^{(2l)}(0) = 0$ (even derivatives vanish)
 - $\theta_{2,3,4}^{(2l+1)}(0) = 0$ (odd derivatives vanish)
 - $\theta_i(m\tau + n) \to 0$ for integer m,n where theta vanishes
+- $E_k\left[\begin{smallmatrix}\pm1\\\pm1\end{smallmatrix}\right](\tau) \to 0$ for odd $k$ (odd-twisted Eisenstein series vanish)
+- $\vartheta_1'(0,q) \to 2\pi\,\eta^3$
 
 ---
 
@@ -417,6 +422,8 @@ $$
 $$
 
 **Bug Fix**: `FlipSignAll\[ScriptA]` and `FlipSignAll\[ScriptA]Reversed` now correctly apply `FlipSign` with the bare `\[ScriptA]` at the end (previously incorrectly used `\[ScriptB]`).
+
+**Bug Fix**: the half-period shift rules $\vartheta_{2,3}(z+m\tau)\ (1/2\le m\lt1)$ dropped the spurious leading factor `I` (kept only for $\vartheta_{1,4}$), and `CurlyThetaDerivativeToCurlyThetaP` now matches the nome with a proper `q_` pattern.
 
 **Dependencies**: [04-eisenstein.wls](modules/04-eisenstein.wls), [07-theta-functions.wls](modules/07-theta-functions.wls)
 
