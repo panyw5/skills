@@ -3,12 +3,12 @@ name: ocr
 description: "perform ocr (optical character recognition) on pdf files in the specified folder, or on the files specified by the user, generate and store corresponding markdown files"
 ---
 
-# WORKFLOW OVERVIEW
+# MANDATORY WORKFLOW
 
 1. 处理用户输入，确定需要 ocr 的文件和文件夹、ocr 结果存放地点
 2. 准备工作: [prepare](prepare.md)
 3. 调用 api 进行 ocr: [ocr-api](ocr-api.md)
-4. 检查 ocr 结果: [check](check.md)
+4. 检查 ocr 质量: [check](check.md)
 5. 修正错误或者反馈
 
 
@@ -39,7 +39,7 @@ description: "perform ocr (optical character recognition) on pdf files in the sp
 
 参考 [ocr-api](ocr-api.md) 文档，完成调用 API 进行 ocr 的工作
 
-# 检查 ocr 结果
+# 检查 ocr 质量
 
 参考 [check](check.md) 文档，完成检查 ocr 结果的工作
 
